@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Transparence Œufs</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --vert-fonce:  #1a4a2e;
+      --vert-mid:    #2d6a44;
+      --vert-clair:  #e8f3ec;
+      --vert-accent: #4caf72;
+      --beige:       #faf7f2;
+      --beige-mid:   #f0ebe0;
+      --texte:       #1a1a18;
+      --texte-doux:  #5a5a52;
+      --blanc:       #ffffff;
+      --ombre:       0 4px 24px rgba(26,74,46,0.10);
+      --radius:      12px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--beige);
+      color: var(--texte);
+      min-height: 100vh;
+      padding-bottom: 60px;
+    }
+
+    /* ── En-tête ── */
+    header {
+      background: var(--vert-fonce);
+      padding: 28px 40px 24px;
+      display: flex;
+      align-items: baseline;
+      gap: 14px;
+    }
+    header h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.7rem;
+      color: var(--blanc);
+    }
+    header .sous-titre {
+      font-size: 0.85rem;
+      color: var(--vert-accent);
+      font-weight: 500;
+      letter-spacing: 0.5px;
+    }
+
+    /* ── Scan ── */
+    .scan-zone {
+      max-width: 680px;
+      margin: 40px auto 0;
+      padding: 0 20px;
+    }
+    .scan-card {
+      background: var(--blanc);
+      border-radius: var(--radius);
+      padding: 32px 36px;
+      box-shadow: var(--ombre);
+      border: 1px solid var(--beige-mid);
+    }
+    .scan-card label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: var(--vert-mid);
+      margin-bottom: 10px;
+    }
+    .scan-row { display: flex; gap: 10px; }
+    .scan-row input {
+      flex: 1;
+      padding: 13px 16px;
+      border: 1.5px solid var(--beige-mid);
+      border-radius: 8px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1rem;
+      color: var(--texte);
+      background: var(--beige);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .scan-row input:focus { border-color: var(--vert-accent); background: var(--blanc); }
+    .scan-row button {
+      padding: 13px 26px;
+      background: var(--vert-fonce);
+      color: var(--blanc);
+      border: none;
+      border-radius: 8px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      white-space: nowrap;
+    }
+    .scan-row button:hover  { background: var(--vert-mid); }
+    .scan-row button:active { transform: scale(0.98); }
+    #status {
+      margin-top: 16px;
+      font-size: 0.9rem;
+      color: var(--texte-doux);
+      min-height: 22px;
+    }
+
+    /* ── Résultat ── */
+    #result {
+      max-width: 860px;
+      margin: 32px auto 0;
+      padding: 0 20px;
+      display: none;
+    }
+
+    /* ── Carte produit ── */
+    .produit-card {
+      background: var(--blanc);
+      border-radius: var(--radius);
+      padding: 28px 32px;
+      box-shadow: var(--ombre);
+      border: 1px solid var(--beige-mid);
+      display: flex;
+      align-items: flex-start;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+    .produit-image {
+      width: 90px; height: 90px;
+      object-fit: contain;
+      border-radius: 8px;
+      background: var(--beige);
+      border: 1px solid var(--beige-mid);
+      flex-shrink: 0;
+    }
+    .produit-placeholder {
+      width: 90px; height: 90px;
+      background: var(--beige-mid);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2rem;
+      flex-shrink: 0;
+    }
+    .produit-info h2 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.4rem;
+      margin-bottom: 4px;
+    }
+    .produit-info .marque {
+      font-size: 0.88rem;
+      color: var(--texte-doux);
+      margin-bottom: 14px;
+    }
+
+    /* ── Badges ── */
+    .badges { display: flex; flex-wrap: wrap; gap: 8px; }
+    .badge {
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 600;
+    }
+    .badge-bio     { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
+    .badge-lr      { background: #fff3e0; color: #e65100; border: 1px solid #ffcc80; }
+    .badge-igp     { background: #e3f2fd; color: #1565c0; border: 1px solid #90caf9; }
+    .badge-prive   { background: #f3e5f5; color: #6a1b9a; border: 1px solid #ce93d8; }
+    .badge-code    { background: #f5f5f5; color: #424242; border: 1px solid #bdbdbd; }
+    .badge-inconnu { background: var(--beige-mid); color: var(--texte-doux); border: 1px solid #ddd; }
+
+    /* ── Alerte ── */
+    .alerte-no-label {
+      background: #fff8e1;
+      border: 1px solid #ffe082;
+      border-radius: var(--radius);
+      padding: 18px 24px;
+      color: #5d4037;
+      font-size: 0.9rem;
+      margin-bottom: 24px;
+      line-height: 1.6;
+    }
+
+    /* ── Section garanties ── */
+    .garanties-section h3 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.2rem;
+      color: var(--vert-fonce);
+      margin-bottom: 4px;
+    }
+    .garanties-section .sous-texte {
+      font-size: 0.82rem;
+      color: var(--texte-doux);
+      margin-bottom: 20px;
+    }
+    .garanties-grille { display: grid; gap: 10px; }
+
+    /* ── Ligne de garantie ── */
+    .garantie-ligne {
+      background: var(--blanc);
+      border: 1px solid var(--beige-mid);
+      border-radius: 10px;
+      padding: 14px 18px;
+      display: grid;
+      grid-template-columns: 200px 1fr 28px;
+      gap: 14px;
+      align-items: center;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+      transition: box-shadow 0.2s;
+    }
+    .garantie-ligne:hover { box-shadow: 0 3px 12px rgba(26,74,46,0.10); }
+
+    .garantie-critere {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--vert-mid);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+    }
+    .garantie-valeur {
+      font-size: 0.92rem;
+      color: var(--texte);
+      line-height: 1.5;
+    }
+
+    /* ── Bouton i ── */
+    .btn-info {
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      border: 1.5px solid var(--beige-mid);
+      background: var(--beige);
+      color: var(--texte-doux);
+      font-size: 0.8rem;
+      font-weight: 700;
+      font-style: italic;
+      font-family: Georgia, serif;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+    }
+    .btn-info:hover {
+      background: var(--vert-clair);
+      border-color: var(--vert-accent);
+      color: var(--vert-fonce);
+    }
+    .btn-info.actif {
+      background: var(--vert-fonce);
+      border-color: var(--vert-fonce);
+      color: var(--blanc);
+    }
+
+    /* ── Bulle d'info ── */
+    .info-bulle {
+      display: none;
+      grid-column: 1 / -1;
+      background: var(--vert-clair);
+      border: 1px solid var(--vert-accent);
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 0.82rem;
+      color: var(--vert-fonce);
+      line-height: 1.7;
+      animation: slideDown 0.15s ease;
+    }
+    .info-bulle.visible { display: block; }
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-4px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .info-bulle .info-label  { font-weight: 600; margin-bottom: 3px; }
+    .info-bulle .info-source { font-style: italic; color: var(--vert-mid); }
+
+    /* ── Debug ── */
+    .debug-section {
+      margin-top: 24px;
+      background: var(--beige-mid);
+      border-radius: var(--radius);
+      padding: 14px 20px;
+    }
+    .debug-section summary {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--texte-doux);
+      cursor: pointer;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    .debug-section p {
+      font-size: 0.78rem;
+      color: var(--texte-doux);
+      margin-top: 10px;
+      font-family: monospace;
+      line-height: 1.6;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 600px) {
+      header { padding: 20px; }
+      .scan-card { padding: 22px; }
+      .garantie-ligne { grid-template-columns: 1fr 28px; }
+      .garantie-critere { grid-column: 1; }
+      .garantie-valeur  { grid-column: 1 / -1; }
+      .btn-info         { grid-column: 2; grid-row: 1; }
+      .produit-card { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>🥚 Transparence Œufs</h1>
+    <span class="sous-titre">Garanties certifiées par label</span>
+  </header>
+
+  <div class="scan-zone">
+    <div class="scan-card">
+      <label for="barcode">Code-barres du produit</label>
+      <div class="scan-row">
+        <input type="text" id="barcode" placeholder="Ex : 3435760253064" autofocus>
+        <button id="btn-rechercher">Analyser</button>
+      </div>
+      <div id="status"></div>
+    </div>
+  </div>
+
+  <div id="result">
+    <div class="produit-card" id="produit-card"></div>
+
+    <div class="alerte-no-label" id="alerte-no-label" style="display:none">
+      ⚠️ <strong>Aucun label reconnu</strong> dans notre base pour ce produit.<br>
+      Labels détectés : <span id="labels-bruts-alerte"></span>
+    </div>
+
+    <div class="garanties-section" id="garanties-section" style="display:none">
+      <h3>Garanties certifiées</h3>
+      <p class="sous-texte">
+        Seuls les critères explicitement imposés par les cahiers des charges officiels sont affichés.
+        Appuie sur <em>i</em> pour voir la source réglementaire de chaque critère.
+      </p>
+      <div class="garanties-grille" id="garanties-grille"></div>
+      <details class="debug-section">
+        <summary>Données brutes Open Food Facts</summary>
+        <p id="debug-labels"></p>
+      </details>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = "http://127.0.0.1:8000";
+
+    const NOMS_CRITERES = {
+      alimentation:            "Alimentation",
+      condition_elevage:       "Condition d'élevage",
+      acces_exterieur:         "Accès à l'extérieur",
+      exterieur:               "Extérieur & parcours",
+      densite_batiment:        "Densité en bâtiment",
+      effectif_max_batiment:   "Effectif max / bâtiment",
+      surface_max_batiment:    "Surface max bâtiment",
+      surface_max_site:        "Surface max du site",
+      effectif_par_elevage:    "Effectif par élevage",
+      parcours_exterieur:      "Description du parcours",
+      surface_parcours:        "Surface du parcours",
+      vide_sanitaire_batiment: "Vide sanitaire bâtiment",
+      vide_sanitaire_parcours: "Vide sanitaire parcours",
+      age_max_poules:          "Âge max des poules",
+      age_min_abattage:        "Âge min avant abattage",
+      aire_geographique:       "Aire géographique",
+      frequence_ramassage:     "Fréquence de ramassage",
+    };
+
+    function classeBadge(type) {
+      if (!type) return "badge-inconnu";
+      const t = type.toLowerCase();
+      if (t.includes("code réglementaire")) return "badge-code";
+      if (t.includes("bio") && !t.includes("privé")) return "badge-bio";
+      if (t.includes("label rouge") || t.includes("inao")) return "badge-lr";
+      if (t.includes("igp") || t.includes("aop")) return "badge-igp";
+      return "badge-prive";
+    }
+
+    // ── Recherche ─────────────────────────────────────────────────────────
+    document.getElementById("btn-rechercher").addEventListener("click", lancerRecherche);
+    document.getElementById("barcode").addEventListener("keydown", e => {
+      if (e.key === "Enter") lancerRecherche();
+    });
+
+    async function lancerRecherche() {
+      const barcode = document.getElementById("barcode").value.trim();
+      if (!barcode) { document.getElementById("status").textContent = "⚠️ Merci d'entrer un code-barres."; return; }
+
+      document.getElementById("status").textContent = "Recherche en cours…";
+      document.getElementById("btn-rechercher").disabled = true;
+      document.getElementById("result").style.display = "none";
+
+      try {
+        const response = await fetch(`${API_BASE}/scan/${barcode}`);
+        if (!response.ok) throw new Error();
+        const data = await response.json();
+
+        document.getElementById("status").textContent = "";
+        document.getElementById("btn-rechercher").disabled = false;
+
+        if (!data.found) {
+          document.getElementById("status").textContent = `⚠️ ${data.message}`;
+          return;
+        }
+        afficherResultat(data.product);
+
+      } catch {
+        document.getElementById("status").textContent = "⚠️ Impossible de contacter le serveur. Vérifie que main.py est lancé.";
+        document.getElementById("btn-rechercher").disabled = false;
+      }
+    }
+
+    // ── Affichage ─────────────────────────────────────────────────────────
+    function afficherResultat(product) {
+      document.getElementById("result").style.display = "block";
+
+      // Carte produit
+      const imageHtml = product.image_url
+        ? `<img class="produit-image" src="${product.image_url}" alt="${product.name}">`
+        : `<div class="produit-placeholder">🥚</div>`;
+
+      const badgesHtml = (product.labels_reconnus?.length > 0)
+        ? product.labels_reconnus.map(l =>
+            `<span class="badge ${classeBadge(l.type)}">${l.nom}</span>`
+          ).join("")
+        : `<span class="badge badge-inconnu">Aucun label reconnu</span>`;
+
+      document.getElementById("produit-card").innerHTML = `
+        ${imageHtml}
+        <div class="produit-info">
+          <h2>${product.name}</h2>
+          <div class="marque">${product.brand}</div>
+          <div class="badges">${badgesHtml}</div>
+        </div>
+      `;
+
+      // Aucun label reconnu
+      if (!product.labels_reconnus?.length) {
+        document.getElementById("alerte-no-label").style.display = "block";
+        document.getElementById("garanties-section").style.display = "none";
+        document.getElementById("labels-bruts-alerte").textContent = product.labels_bruts || "aucun";
+        return;
+      }
+
+      document.getElementById("alerte-no-label").style.display = "none";
+      document.getElementById("garanties-section").style.display = "block";
+
+      // Tableau des garanties
+      const grille = document.getElementById("garanties-grille");
+      grille.innerHTML = "";
+
+      Object.entries(product.garanties || {}).forEach(([cle, data], idx) => {
+        if (!data.valeur || data.valeur === "NS") return;
+
+        const idBulle = `bulle-${idx}`;
+        const ligne = document.createElement("div");
+        ligne.className = "garantie-ligne";
+
+        ligne.innerHTML = `
+          <div class="garantie-critere">${NOMS_CRITERES[cle] || cle}</div>
+          <div class="garantie-valeur">${data.valeur}</div>
+          <button class="btn-info" data-id="${idBulle}" aria-label="Source réglementaire">i</button>
+          <div class="info-bulle" id="${idBulle}">
+            ${data.label_source ? `<div class="info-label">📋 ${data.label_source}</div>` : ""}
+            ${data.source && data.source !== "NS"
+              ? `<div class="info-source">📎 ${data.source}</div>`
+              : `<div class="info-source">Source non renseignée</div>`}
+          </div>
+        `;
+        grille.appendChild(ligne);
+      });
+
+      // Délégation d'événement pour les boutons i
+      grille.addEventListener("click", e => {
+        const btn = e.target.closest(".btn-info");
+        if (!btn) return;
+
+        const idCible = btn.dataset.id;
+        const bulle   = document.getElementById(idCible);
+
+        // Fermer les autres bulles ouvertes
+        grille.querySelectorAll(".info-bulle.visible").forEach(b => {
+          if (b.id !== idCible) {
+            b.classList.remove("visible");
+            b.closest(".garantie-ligne").querySelector(".btn-info").classList.remove("actif");
+          }
+        });
+
+        // Ouvrir / fermer la bulle cliquée
+        const estOuverte = bulle.classList.contains("visible");
+        bulle.classList.toggle("visible", !estOuverte);
+        btn.classList.toggle("actif", !estOuverte);
+      });
+
+      // Debug
+      document.getElementById("debug-labels").textContent =
+        `labels_tags Open Food Facts : ${product.labels_bruts || "aucun"}`;
+    }
+  </script>
+</body>
+</html>
