@@ -86,6 +86,17 @@ LABEL_MAPPING = {
     "fr:cage-amenagee":                       "code_3_cage",
     "fr:oeufs-de-poules-elevees-en-cage":     "code_3_cage",
 
+    # Œufs de France (label interprofessionnel)
+    "fr:oeufs-de-france":                "oeufs_de_france",
+    "en:oeufs-de-france":                "oeufs_de_france",
+    "fr:label-oeufs-de-france":          "oeufs_de_france",
+
+    # Tags produit 3414280077060 (plein air, tags OFF non standard)
+    "fr:respect-du-bien-etre-animal":    "code_1_plein_air",
+    "fr:exploitations-familiales":       "code_1_plein_air",  # indice plein air
+
+    # Tags produit 3435760953124 (au sol, détecté via catégories dans main.py)
+
     # Volailles Fermières du Maine
     "fr:volailles-fermieres-du-maine":   "volailles_maine",
     "en:volailles-fermieres-du-maine":   "volailles_maine",
@@ -888,6 +899,43 @@ LABELS_DB = {
         }
     },
 
+    # ──────────────────────────────────────────────────────────────────────────
+    # ŒUFS DE FRANCE
+    # Label interprofessionnel géré par CNPO (Comité National pour la promotion
+    # de l'Œuf). Garantit l'origine France uniquement, pas de critères d'élevage
+    # spécifiques au-delà de la réglementation UE en vigueur.
+    # Source : Cahier des charges Œufs de France / CNPO
+    # ──────────────────────────────────────────────────────────────────────────
+    "oeufs_de_france": {
+        "nom_complet": "Œufs de France",
+        "type": "Label interprofessionnel",
+        "criteres": {
+            "alimentation":            {"valeur": NS, "source": NS},
+            "condition_elevage": {
+                "valeur": "Conforme à la réglementation UE en vigueur (code d'élevage apposé sur l'œuf).",
+                "source": "Cahier des charges Œufs de France / CNPO"
+            },
+            "acces_exterieur":         {"valeur": NS, "source": NS},
+            "exterieur":               {"valeur": NS, "source": NS},
+            "densite_batiment":        {"valeur": NS, "source": NS},
+            "effectif_max_batiment":   {"valeur": NS, "source": NS},
+            "surface_max_batiment":    {"valeur": NS, "source": NS},
+            "surface_max_site":        {"valeur": NS, "source": NS},
+            "effectif_par_elevage":    {"valeur": NS, "source": NS},
+            "parcours_exterieur":      {"valeur": NS, "source": NS},
+            "surface_parcours":        {"valeur": NS, "source": NS},
+            "vide_sanitaire_batiment": {"valeur": NS, "source": NS},
+            "vide_sanitaire_parcours": {"valeur": NS, "source": NS},
+            "age_max_poules":          {"valeur": NS, "source": NS},
+            "age_min_abattage":        {"valeur": NS, "source": NS},
+            "aire_geographique": {
+                "valeur": "France",
+                "source": "Cahier des charges Œufs de France / CNPO"
+            },
+            "frequence_ramassage":     {"valeur": NS, "source": NS},
+        }
+    },
+
 }  # fin LABELS_DB
 
 
@@ -913,6 +961,7 @@ PRIORITY_ORDER = [
     "volailles_maine",
     "volailles_gascogne",
     "bleu_blanc_coeur",
+    "oeufs_de_france",
     "code_1_plein_air",
     "code_2_sol",
     "code_3_cage",
