@@ -2,9 +2,11 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Transparence Œufs</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Transparence Alimentaire</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <!-- ZXing : lecture de code-barres via caméra -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/zxing-js/0.18.6/index.min.js"></script>
   <style>
     :root {
       --vert-fonce:  #1a4a2e;
@@ -16,6 +18,8 @@
       --texte:       #1a1a18;
       --texte-doux:  #5a5a52;
       --blanc:       #ffffff;
+      --rouge:       #c62828;
+      --orange:      #e65100;
       --ombre:       0 4px 24px rgba(26,74,46,0.10);
       --radius:      12px;
     }
@@ -25,55 +29,75 @@
       background: var(--beige);
       color: var(--texte);
       min-height: 100vh;
-      padding-bottom: 60px;
+      padding-bottom: 80px;
     }
 
     /* ── En-tête ── */
     header {
       background: var(--vert-fonce);
-      padding: 28px 40px 24px;
+      padding: 20px 24px;
       display: flex;
       align-items: baseline;
-      gap: 14px;
+      gap: 12px;
     }
-    header h1 {
-      font-family: 'DM Serif Display', serif;
-      font-size: 1.7rem;
-      color: var(--blanc);
-    }
-    header .sous-titre {
-      font-size: 0.85rem;
-      color: var(--vert-accent);
-      font-weight: 500;
-      letter-spacing: 0.5px;
-    }
+    header h1 { font-family: 'DM Serif Display', serif; font-size: 1.5rem; color: var(--blanc); }
+    header .sous-titre { font-size: 0.8rem; color: var(--vert-accent); font-weight: 500; }
 
-    /* ── Scan ── */
+    /* ── Zone de scan ── */
     .scan-zone {
-      max-width: 680px;
-      margin: 40px auto 0;
-      padding: 0 20px;
+      max-width: 600px;
+      margin: 28px auto 0;
+      padding: 0 16px;
     }
     .scan-card {
       background: var(--blanc);
       border-radius: var(--radius);
-      padding: 32px 36px;
+      padding: 24px;
       box-shadow: var(--ombre);
       border: 1px solid var(--beige-mid);
     }
     .scan-card label {
       display: block;
-      font-size: 0.78rem;
+      font-size: 0.75rem;
       font-weight: 600;
-      letter-spacing: 1.2px;
+      letter-spacing: 1.1px;
       text-transform: uppercase;
       color: var(--vert-mid);
       margin-bottom: 10px;
     }
-    .scan-row { display: flex; gap: 10px; }
+
+    /* Indicateur de slot actif */
+    .slot-indicateur {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .slot-dot {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: var(--beige-mid);
+      color: var(--texte-doux);
+      border: 1.5px solid transparent;
+    }
+    .slot-dot.actif {
+      background: var(--vert-clair);
+      color: var(--vert-fonce);
+      border-color: var(--vert-accent);
+    }
+    .slot-dot.rempli {
+      background: var(--vert-fonce);
+      color: var(--blanc);
+    }
+
+    .scan-row { display: flex; gap: 8px; }
     .scan-row input {
       flex: 1;
-      padding: 13px 16px;
+      padding: 12px 14px;
       border: 1.5px solid var(--beige-mid);
       border-radius: 8px;
       font-family: 'DM Sans', sans-serif;
@@ -82,83 +106,185 @@
       background: var(--beige);
       outline: none;
       transition: border-color 0.2s;
+      min-width: 0;
     }
     .scan-row input:focus { border-color: var(--vert-accent); background: var(--blanc); }
-    .scan-row button {
-      padding: 13px 26px;
-      background: var(--vert-fonce);
-      color: var(--blanc);
+    .scan-row input:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    .btn { 
+      padding: 12px 18px;
       border: none;
       border-radius: 8px;
       font-family: 'DM Sans', sans-serif;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       font-weight: 600;
       cursor: pointer;
       transition: background 0.2s, transform 0.1s;
       white-space: nowrap;
+      flex-shrink: 0;
     }
-    .scan-row button:hover  { background: var(--vert-mid); }
-    .scan-row button:active { transform: scale(0.98); }
-    #status {
-      margin-top: 16px;
-      font-size: 0.9rem;
-      color: var(--texte-doux);
-      min-height: 22px;
+    .btn:active { transform: scale(0.97); }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+    .btn-primaire { background: var(--vert-fonce); color: var(--blanc); }
+    .btn-primaire:hover:not(:disabled) { background: var(--vert-mid); }
+    .btn-camera {
+      background: var(--beige-mid);
+      color: var(--vert-fonce);
+      border: 1.5px solid var(--beige-mid);
+      font-size: 1.1rem;
+      padding: 12px 14px;
     }
-
-    /* ── Résultat ── */
-    #result {
-      max-width: 860px;
-      margin: 32px auto 0;
-      padding: 0 20px;
+    .btn-camera:hover:not(:disabled) { background: var(--vert-clair); border-color: var(--vert-accent); }
+    .btn-reset {
+      width: 100%;
+      margin-top: 14px;
+      background: #fff3e0;
+      color: var(--orange);
+      border: 1.5px solid #ffcc80;
       display: none;
     }
+    .btn-reset:hover { background: #ffe0b2; }
+    .btn-reset.visible { display: block; }
 
-    /* ── Carte produit ── */
-    .produit-card {
+    #status {
+      margin-top: 12px;
+      font-size: 0.88rem;
+      color: var(--texte-doux);
+      min-height: 20px;
+    }
+
+    /* ── Viewer caméra ── */
+    #camera-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.92);
+      z-index: 1000;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+    }
+    #camera-overlay.visible { display: flex; }
+
+    #camera-container {
+      position: relative;
+      width: min(90vw, 400px);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    #camera-video {
+      width: 100%;
+      display: block;
+      border-radius: 16px;
+    }
+    .camera-viseur {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+    .camera-viseur-cadre {
+      width: 65%;
+      aspect-ratio: 3/2;
+      border: 2.5px solid var(--vert-accent);
+      border-radius: 10px;
+      box-shadow: 0 0 0 2000px rgba(0,0,0,0.35);
+    }
+    .camera-label {
+      color: var(--blanc);
+      font-size: 0.9rem;
+      text-align: center;
+      opacity: 0.85;
+    }
+    #btn-fermer-camera {
+      background: rgba(255,255,255,0.15);
+      color: var(--blanc);
+      border: 1.5px solid rgba(255,255,255,0.3);
+      border-radius: 8px;
+      padding: 10px 28px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* ── Zone résultats ── */
+    #resultats {
+      max-width: 1100px;
+      margin: 28px auto 0;
+      padding: 0 16px;
+    }
+
+    /* Alerte type incompatible */
+    .alerte-type {
+      background: #fce4ec;
+      border: 1px solid #f48fb1;
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      color: #880e4f;
+      font-size: 0.9rem;
+      margin-bottom: 20px;
+      display: none;
+    }
+    .alerte-type.visible { display: block; }
+
+    /* ── Grille de comparaison ── */
+    .comparaison-grille {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+    @media (min-width: 700px) {
+      .comparaison-grille { grid-template-columns: 1fr 1fr; }
+    }
+
+    /* ── Colonne produit ── */
+    .produit-colonne {
       background: var(--blanc);
       border-radius: var(--radius);
-      padding: 28px 32px;
       box-shadow: var(--ombre);
       border: 1px solid var(--beige-mid);
+      overflow: hidden;
+    }
+
+    /* En-tête de colonne */
+    .produit-header {
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--beige-mid);
       display: flex;
       align-items: flex-start;
-      gap: 24px;
-      margin-bottom: 24px;
+      gap: 14px;
     }
-    .produit-image {
-      width: 90px; height: 90px;
+    .produit-img {
+      width: 70px; height: 70px;
       object-fit: contain;
       border-radius: 8px;
       background: var(--beige);
       border: 1px solid var(--beige-mid);
       flex-shrink: 0;
     }
-    .produit-placeholder {
-      width: 90px; height: 90px;
+    .produit-img-placeholder {
+      width: 70px; height: 70px;
       background: var(--beige-mid);
       border-radius: 8px;
       display: flex; align-items: center; justify-content: center;
-      font-size: 2rem;
-      flex-shrink: 0;
+      font-size: 1.6rem; flex-shrink: 0;
     }
-    .produit-info h2 {
+    .produit-meta h2 {
       font-family: 'DM Serif Display', serif;
-      font-size: 1.4rem;
-      margin-bottom: 4px;
+      font-size: 1.05rem;
+      margin-bottom: 3px;
+      line-height: 1.3;
     }
-    .produit-info .marque {
-      font-size: 0.88rem;
-      color: var(--texte-doux);
-      margin-bottom: 14px;
-    }
-
-    /* ── Badges ── */
-    .badges { display: flex; flex-wrap: wrap; gap: 8px; }
+    .produit-meta .marque { font-size: 0.82rem; color: var(--texte-doux); margin-bottom: 8px; }
+    .badges { display: flex; flex-wrap: wrap; gap: 6px; }
     .badge {
-      padding: 5px 12px;
+      padding: 4px 10px;
       border-radius: 20px;
-      font-size: 0.78rem;
+      font-size: 0.72rem;
       font-weight: 600;
     }
     .badge-bio     { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
@@ -168,302 +294,497 @@
     .badge-code    { background: #f5f5f5; color: #424242; border: 1px solid #bdbdbd; }
     .badge-inconnu { background: var(--beige-mid); color: var(--texte-doux); border: 1px solid #ddd; }
 
-    /* ── Alerte ── */
+    /* Alerte aucun label dans la colonne */
     .alerte-no-label {
+      margin: 14px 16px;
       background: #fff8e1;
       border: 1px solid #ffe082;
-      border-radius: var(--radius);
-      padding: 18px 24px;
+      border-radius: 8px;
+      padding: 12px 16px;
       color: #5d4037;
-      font-size: 0.9rem;
-      margin-bottom: 24px;
+      font-size: 0.82rem;
       line-height: 1.6;
     }
 
-    /* ── Section garanties ── */
-    .garanties-section h3 {
+    /* Corps garanties */
+    .garanties-body { padding: 14px 16px; }
+    .garanties-body h3 {
       font-family: 'DM Serif Display', serif;
-      font-size: 1.2rem;
+      font-size: 1rem;
       color: var(--vert-fonce);
-      margin-bottom: 4px;
+      margin-bottom: 12px;
     }
-    .garanties-section .sous-texte {
-      font-size: 0.82rem;
-      color: var(--texte-doux);
-      margin-bottom: 20px;
-    }
-    .garanties-grille { display: grid; gap: 10px; }
+    .garanties-liste { display: grid; gap: 8px; }
 
-    /* ── Ligne de garantie ── */
+    /* Ligne garantie */
     .garantie-ligne {
-      background: var(--blanc);
+      background: var(--beige);
       border: 1px solid var(--beige-mid);
-      border-radius: 10px;
-      padding: 14px 18px;
+      border-radius: 8px;
+      padding: 10px 12px;
       display: grid;
-      grid-template-columns: 200px 1fr 28px;
-      gap: 14px;
-      align-items: center;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
-      transition: box-shadow 0.2s;
+      grid-template-columns: 1fr 26px;
+      gap: 8px;
+      align-items: start;
     }
-    .garantie-ligne:hover { box-shadow: 0 3px 12px rgba(26,74,46,0.10); }
+
+    /* En mode comparaison : surligner le meilleur */
+    .garantie-ligne.meilleur {
+      background: var(--vert-clair);
+      border-color: var(--vert-accent);
+    }
+    .garantie-ligne.moins-bien {
+      background: #fff8f8;
+      border-color: #ffcdd2;
+    }
 
     .garantie-critere {
-      font-size: 0.8rem;
-      font-weight: 600;
+      font-size: 0.72rem;
+      font-weight: 700;
       color: var(--vert-mid);
       text-transform: uppercase;
-      letter-spacing: 0.6px;
+      letter-spacing: 0.5px;
+      margin-bottom: 3px;
     }
-    .garantie-valeur {
-      font-size: 0.92rem;
-      color: var(--texte);
-      line-height: 1.5;
-    }
+    .garantie-valeur { font-size: 0.87rem; color: var(--texte); line-height: 1.4; }
 
-    /* ── Bouton i ── */
+    /* Bouton i */
     .btn-info {
-      width: 26px; height: 26px;
+      width: 24px; height: 24px;
       border-radius: 50%;
       border: 1.5px solid var(--beige-mid);
-      background: var(--beige);
+      background: var(--blanc);
       color: var(--texte-doux);
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       font-weight: 700;
       font-style: italic;
       font-family: Georgia, serif;
       cursor: pointer;
       display: flex; align-items: center; justify-content: center;
       flex-shrink: 0;
+      margin-top: 2px;
       transition: background 0.15s, border-color 0.15s, color 0.15s;
     }
-    .btn-info:hover {
-      background: var(--vert-clair);
-      border-color: var(--vert-accent);
-      color: var(--vert-fonce);
-    }
-    .btn-info.actif {
-      background: var(--vert-fonce);
-      border-color: var(--vert-fonce);
-      color: var(--blanc);
-    }
+    .btn-info:hover { background: var(--vert-clair); border-color: var(--vert-accent); color: var(--vert-fonce); }
+    .btn-info.actif { background: var(--vert-fonce); border-color: var(--vert-fonce); color: var(--blanc); }
 
-    /* ── Bulle d'info ── */
+    /* Bulle */
     .info-bulle {
       display: none;
       grid-column: 1 / -1;
       background: var(--vert-clair);
       border: 1px solid var(--vert-accent);
-      border-radius: 8px;
-      padding: 12px 16px;
-      font-size: 0.82rem;
+      border-radius: 6px;
+      padding: 10px 12px;
+      font-size: 0.78rem;
       color: var(--vert-fonce);
-      line-height: 1.7;
-      animation: slideDown 0.15s ease;
+      line-height: 1.6;
+      animation: slideDown 0.12s ease;
     }
     .info-bulle.visible { display: block; }
-
     @keyframes slideDown {
-      from { opacity: 0; transform: translateY(-4px); }
+      from { opacity: 0; transform: translateY(-3px); }
       to   { opacity: 1; transform: translateY(0); }
     }
-
-    .info-bulle .info-label  { font-weight: 600; margin-bottom: 3px; }
+    .info-bulle .info-label  { font-weight: 600; margin-bottom: 2px; }
     .info-bulle .info-source { font-style: italic; color: var(--vert-mid); }
 
-    /* ── Debug ── */
+    /* Debug */
     .debug-section {
-      margin-top: 24px;
+      margin: 12px 16px 16px;
       background: var(--beige-mid);
-      border-radius: var(--radius);
-      padding: 14px 20px;
+      border-radius: 8px;
+      padding: 10px 14px;
     }
-    .debug-section summary {
-      font-size: 0.78rem;
-      font-weight: 600;
-      color: var(--texte-doux);
-      cursor: pointer;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-    }
-    .debug-section p {
-      font-size: 0.78rem;
-      color: var(--texte-doux);
-      margin-top: 10px;
-      font-family: monospace;
-      line-height: 1.6;
-    }
-
-    /* ── Responsive ── */
-    @media (max-width: 600px) {
-      header { padding: 20px; }
-      .scan-card { padding: 22px; }
-      .garantie-ligne { grid-template-columns: 1fr 28px; }
-      .garantie-critere { grid-column: 1; }
-      .garantie-valeur  { grid-column: 1 / -1; }
-      .btn-info         { grid-column: 2; grid-row: 1; }
-      .produit-card { flex-direction: column; }
-    }
+    .debug-section summary { font-size: 0.72rem; font-weight: 600; color: var(--texte-doux); cursor: pointer; text-transform: uppercase; }
+    .debug-section p { font-size: 0.72rem; color: var(--texte-doux); margin-top: 8px; font-family: monospace; line-height: 1.5; }
   </style>
 </head>
 <body>
 
   <header>
-    <h1>🥚 Transparence Œufs</h1>
+    <h1>🥚 Transparence Alimentaire</h1>
     <span class="sous-titre">Garanties certifiées par label</span>
   </header>
 
+  <!-- ── Zone de scan ── -->
   <div class="scan-zone">
     <div class="scan-card">
-      <label for="barcode">Code-barres du produit</label>
-      <div class="scan-row">
-        <input type="text" id="barcode" placeholder="Ex : 3435760253064" autofocus>
-        <button id="btn-rechercher">Analyser</button>
+      <label>Scan produit</label>
+
+      <!-- Indicateurs de slots -->
+      <div class="slot-indicateur">
+        <div class="slot-dot" id="dot-1">① Produit A</div>
+        <div class="slot-dot" id="dot-2">② Produit B</div>
       </div>
+
+      <div class="scan-row">
+        <input type="text" id="barcode" placeholder="Code-barres ou scanner →" inputmode="numeric">
+        <button class="btn btn-camera" id="btn-camera" title="Scanner avec la caméra">📷</button>
+        <button class="btn btn-primaire" id="btn-analyser">Analyser</button>
+      </div>
+
+      <button class="btn btn-reset" id="btn-reset">🔄 Nouvelle comparaison</button>
       <div id="status"></div>
     </div>
   </div>
 
-  <div id="result">
-    <div class="produit-card" id="produit-card"></div>
-
-    <div class="alerte-no-label" id="alerte-no-label" style="display:none">
-      ⚠️ <strong>Aucun label reconnu</strong> dans notre base pour ce produit.<br>
-      Labels détectés : <span id="labels-bruts-alerte"></span>
+  <!-- ── Overlay caméra ── -->
+  <div id="camera-overlay">
+    <div id="camera-container">
+      <video id="camera-video" autoplay playsinline muted></video>
+      <div class="camera-viseur">
+        <div class="camera-viseur-cadre"></div>
+      </div>
     </div>
-
-    <div class="garanties-section" id="garanties-section" style="display:none">
-      <h3>Garanties certifiées</h3>
-      <p class="sous-texte">
-        Seuls les critères explicitement imposés par les cahiers des charges officiels sont affichés.
-        Appuie sur <em>i</em> pour voir la source réglementaire de chaque critère.
-      </p>
-      <div class="garanties-grille" id="garanties-grille"></div>
-      <details class="debug-section">
-        <summary>Données brutes Open Food Facts</summary>
-        <p id="debug-labels"></p>
-      </details>
-    </div>
+    <div class="camera-label">Pointez le code-barres dans le cadre</div>
+    <button id="btn-fermer-camera">Annuler</button>
   </div>
 
+  <!-- ── Zone résultats ── -->
+  <div id="resultats">
+    <div class="alerte-type" id="alerte-type">
+      ⚠️ <strong>Comparaison impossible</strong> — ces deux produits ne sont pas de la même catégorie.<br>
+      <span id="alerte-type-detail"></span>
+    </div>
+    <div class="comparaison-grille" id="comparaison-grille"></div>
+  </div>
+
+
   <script>
-    const API_BASE = "";
+  // ═══════════════════════════════════════════════════════════════════════════
+  // CONFIGURATION
+  // ═══════════════════════════════════════════════════════════════════════════
 
-    const NOMS_CRITERES = {
-      alimentation:            "Alimentation",
-      condition_elevage:       "Condition d'élevage",
-      acces_exterieur:         "Accès à l'extérieur",
-      exterieur:               "Extérieur & parcours",
-      densite_batiment:        "Densité en bâtiment",
-      effectif_max_batiment:   "Effectif max / bâtiment",
-      surface_max_batiment:    "Surface max bâtiment",
-      surface_max_site:        "Surface max du site",
-      effectif_par_elevage:    "Effectif par élevage",
-      parcours_exterieur:      "Description du parcours",
-      surface_parcours:        "Surface du parcours",
-      vide_sanitaire_batiment: "Vide sanitaire bâtiment",
-      vide_sanitaire_parcours: "Vide sanitaire parcours",
-      age_max_poules:          "Âge max des poules",
-      age_min_abattage:        "Âge min avant abattage",
-      aire_geographique:       "Aire géographique",
-      frequence_ramassage:     "Fréquence de ramassage",
-    };
+  const API_BASE = "";   // Vide = même serveur que la page (fonctionne local ET Render)
 
-    function classeBadge(type) {
-      if (!type) return "badge-inconnu";
-      const t = type.toLowerCase();
-      if (t.includes("code réglementaire")) return "badge-code";
-      if (t.includes("bio") && !t.includes("privé")) return "badge-bio";
-      if (t.includes("label rouge") || t.includes("inao")) return "badge-lr";
-      if (t.includes("igp") || t.includes("aop")) return "badge-igp";
-      return "badge-prive";
+  const NOMS_CRITERES = {
+    alimentation:            "Alimentation",
+    condition_elevage:       "Condition d'élevage",
+    acces_exterieur:         "Accès à l'extérieur",
+    exterieur:               "Extérieur & parcours",
+    densite_batiment:        "Densité en bâtiment",
+    effectif_max_batiment:   "Effectif max / bâtiment",
+    surface_max_batiment:    "Surface max bâtiment",
+    surface_max_site:        "Surface max du site",
+    effectif_par_elevage:    "Effectif par élevage",
+    parcours_exterieur:      "Description du parcours",
+    surface_parcours:        "Surface du parcours",
+    vide_sanitaire_batiment: "Vide sanitaire bâtiment",
+    vide_sanitaire_parcours: "Vide sanitaire parcours",
+    age_max_poules:          "Âge max des poules",
+    age_min_abattage:        "Âge min avant abattage",
+    aire_geographique:       "Aire géographique",
+    frequence_ramassage:     "Fréquence de ramassage",
+  };
+
+  // Catégories connues pour la vérification de compatibilité
+  const CATEGORIES_CONNUES = [
+    { id: "oeufs",   mots: ["oeuf", "œuf", "egg"] },
+    { id: "poulet",  mots: ["poulet", "chicken", "volaille"] },
+    { id: "boeuf",   mots: ["boeuf", "bœuf", "beef", "bovin"] },
+    { id: "porc",    mots: ["porc", "pork", "cochon"] },
+    { id: "agneau",  mots: ["agneau", "lamb", "ovin"] },
+    { id: "saumon",  mots: ["saumon", "salmon"] },
+    { id: "lait",    mots: ["lait", "milk"] },
+  ];
+
+  function detecterCategorie(product) {
+    const texte = [
+      product.name || "",
+      product.categories || "",
+    ].join(" ").toLowerCase();
+
+    for (const cat of CATEGORIES_CONNUES) {
+      if (cat.mots.some(m => texte.includes(m))) return cat.id;
     }
+    return null;
+  }
 
-    // ── Recherche ─────────────────────────────────────────────────────────
-    document.getElementById("btn-rechercher").addEventListener("click", lancerRecherche);
-    document.getElementById("barcode").addEventListener("keydown", e => {
-      if (e.key === "Enter") lancerRecherche();
-    });
+  function classeBadge(type) {
+    if (!type) return "badge-inconnu";
+    const t = type.toLowerCase();
+    if (t.includes("code réglementaire")) return "badge-code";
+    if (t.includes("bio") && !t.includes("privé")) return "badge-bio";
+    if (t.includes("label rouge") || t.includes("inao")) return "badge-lr";
+    if (t.includes("igp") || t.includes("aop")) return "badge-igp";
+    return "badge-prive";
+  }
 
-    async function lancerRecherche() {
-      const barcode = document.getElementById("barcode").value.trim();
-      if (!barcode) { document.getElementById("status").textContent = "⚠️ Merci d'entrer un code-barres."; return; }
+  // ═══════════════════════════════════════════════════════════════════════════
+  // ÉTAT DE L'APPLICATION
+  // ═══════════════════════════════════════════════════════════════════════════
 
-      document.getElementById("status").textContent = "Recherche en cours…";
-      document.getElementById("btn-rechercher").disabled = true;
-      document.getElementById("result").style.display = "none";
+  let produits = [null, null];   // [produitA, produitB]
+  let slotActif = 0;             // 0 = on remplit A, 1 = on remplit B
+  let scannerActif = false;
+  let codeReader = null;
 
-      try {
-        const response = await fetch(`${API_BASE}/scan/${barcode}`);
-        if (!response.ok) throw new Error();
-        const data = await response.json();
+  // ═══════════════════════════════════════════════════════════════════════════
+  // UI HELPERS
+  // ═══════════════════════════════════════════════════════════════════════════
 
-        document.getElementById("status").textContent = "";
-        document.getElementById("btn-rechercher").disabled = false;
+  function setStatus(msg) { document.getElementById("status").textContent = msg; }
 
-        if (!data.found) {
-          document.getElementById("status").textContent = `⚠️ ${data.message}`;
-          return;
+  function mettreAJourSlots() {
+    const dot1 = document.getElementById("dot-1");
+    const dot2 = document.getElementById("dot-2");
+
+    dot1.className = "slot-dot" + (produits[0] ? " rempli" : (slotActif === 0 ? " actif" : ""));
+    dot2.className = "slot-dot" + (produits[1] ? " rempli" : (slotActif === 1 ? " actif" : ""));
+
+    const tousRemplis = produits[0] && produits[1];
+    const input = document.getElementById("barcode");
+    const btnAnalyser = document.getElementById("btn-analyser");
+    const btnCamera = document.getElementById("btn-camera");
+    const btnReset = document.getElementById("btn-reset");
+
+    input.disabled = tousRemplis;
+    btnAnalyser.disabled = tousRemplis;
+    btnCamera.disabled = tousRemplis;
+    btnReset.classList.toggle("visible", tousRemplis);
+
+    if (!tousRemplis) {
+      input.placeholder = slotActif === 0
+        ? "Scanner le Produit A…"
+        : "Scanner le Produit B…";
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // SCAN MANUEL
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  document.getElementById("btn-analyser").addEventListener("click", () => {
+    const val = document.getElementById("barcode").value.trim();
+    if (val) lancerRecherche(val);
+    else setStatus("⚠️ Merci d'entrer un code-barres.");
+  });
+
+  document.getElementById("barcode").addEventListener("keydown", e => {
+    if (e.key === "Enter") {
+      const val = document.getElementById("barcode").value.trim();
+      if (val) lancerRecherche(val);
+    }
+  });
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // SCAN CAMÉRA (ZXing)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  document.getElementById("btn-camera").addEventListener("click", ouvrirCamera);
+  document.getElementById("btn-fermer-camera").addEventListener("click", fermerCamera);
+
+  async function ouvrirCamera() {
+    if (scannerActif) return;
+
+    const overlay = document.getElementById("camera-overlay");
+    overlay.classList.add("visible");
+
+    try {
+      // Initialise ZXing si pas encore fait
+      if (!codeReader) {
+        codeReader = new ZXing.BrowserMultiFormatReader();
+      }
+
+      const devices = await ZXing.BrowserCodeReader.listVideoInputDevices();
+      // Préférer la caméra arrière sur mobile
+      const camera = devices.find(d =>
+        d.label.toLowerCase().includes("back") ||
+        d.label.toLowerCase().includes("arrière") ||
+        d.label.toLowerCase().includes("environment")
+      ) || devices[devices.length - 1];
+
+      if (!camera) {
+        fermerCamera();
+        setStatus("⚠️ Aucune caméra détectée.");
+        return;
+      }
+
+      scannerActif = true;
+      const videoEl = document.getElementById("camera-video");
+
+      await codeReader.decodeFromVideoDevice(
+        camera.deviceId,
+        videoEl,
+        (result, err) => {
+          if (result) {
+            fermerCamera();
+            const code = result.getText();
+            document.getElementById("barcode").value = code;
+            lancerRecherche(code);
+          }
+          // On ignore les erreurs de lecture (scan en cours)
         }
-        afficherResultat(data.product);
+      );
 
-      } catch {
-        document.getElementById("status").textContent = "⚠️ Impossible de contacter le serveur. Vérifie que main.py est lancé.";
-        document.getElementById("btn-rechercher").disabled = false;
+    } catch (err) {
+      fermerCamera();
+      if (err.name === "NotAllowedError") {
+        setStatus("⚠️ Accès à la caméra refusé. Autorisez-le dans les réglages du navigateur.");
+      } else {
+        setStatus("⚠️ Impossible d'accéder à la caméra : " + err.message);
       }
     }
+  }
 
-    // ── Affichage ─────────────────────────────────────────────────────────
-    function afficherResultat(product) {
-      document.getElementById("result").style.display = "block";
+  function fermerCamera() {
+    scannerActif = false;
+    if (codeReader) {
+      codeReader.reset();
+    }
+    document.getElementById("camera-overlay").classList.remove("visible");
+  }
 
-      // Carte produit
-      const imageHtml = product.image_url
-        ? `<img class="produit-image" src="${product.image_url}" alt="${product.name}">`
-        : `<div class="produit-placeholder">🥚</div>`;
+  // ═══════════════════════════════════════════════════════════════════════════
+  // RESET
+  // ═══════════════════════════════════════════════════════════════════════════
 
-      const badgesHtml = (product.labels_reconnus?.length > 0)
-        ? product.labels_reconnus.map(l =>
-            `<span class="badge ${classeBadge(l.type)}">${l.nom}</span>`
-          ).join("")
-        : `<span class="badge badge-inconnu">Aucun label reconnu</span>`;
+  document.getElementById("btn-reset").addEventListener("click", () => {
+    produits = [null, null];
+    slotActif = 0;
+    document.getElementById("barcode").value = "";
+    document.getElementById("comparaison-grille").innerHTML = "";
+    document.getElementById("alerte-type").classList.remove("visible");
+    setStatus("");
+    mettreAJourSlots();
+  });
 
-      document.getElementById("produit-card").innerHTML = `
-        ${imageHtml}
-        <div class="produit-info">
+  // ═══════════════════════════════════════════════════════════════════════════
+  // RECHERCHE API
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  async function lancerRecherche(barcode) {
+    setStatus("Recherche en cours…");
+    document.getElementById("btn-analyser").disabled = true;
+    document.getElementById("btn-camera").disabled = true;
+
+    try {
+      const response = await fetch(`${API_BASE}/scan/${barcode}`);
+      if (!response.ok) throw new Error();
+      const data = await response.json();
+
+      document.getElementById("btn-analyser").disabled = false;
+      document.getElementById("btn-camera").disabled = false;
+
+      if (!data.found) {
+        setStatus(`⚠️ ${data.message}`);
+        return;
+      }
+
+      setStatus("");
+      document.getElementById("barcode").value = "";
+
+      // Stocker le produit dans le slot actif
+      produits[slotActif] = data.product;
+
+      // Vérifier la compatibilité si les deux slots sont remplis
+      if (slotActif === 1 && produits[0] && produits[1]) {
+        const catA = detecterCategorie(produits[0]);
+        const catB = detecterCategorie(produits[1]);
+
+        if (catA && catB && catA !== catB) {
+          document.getElementById("alerte-type-detail").textContent =
+            `Produit A : catégorie "${catA}" — Produit B : catégorie "${catB}"`;
+          document.getElementById("alerte-type").classList.add("visible");
+        } else {
+          document.getElementById("alerte-type").classList.remove("visible");
+        }
+      }
+
+      // Avancer le slot
+      if (slotActif === 0) slotActif = 1;
+
+      mettreAJourSlots();
+      afficherComparaison();
+
+    } catch {
+      setStatus("⚠️ Impossible de contacter le serveur.");
+      document.getElementById("btn-analyser").disabled = false;
+      document.getElementById("btn-camera").disabled = false;
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // AFFICHAGE
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  function afficherComparaison() {
+    const grille = document.getElementById("comparaison-grille");
+    grille.innerHTML = "";
+
+    produits.forEach((product, idx) => {
+      if (!product) return;
+      grille.appendChild(creerColonneProduit(product, idx));
+    });
+
+    // Surlignage comparatif si les deux produits sont présents
+    if (produits[0] && produits[1]) {
+      surligner();
+    }
+  }
+
+  function creerColonneProduit(product, idx) {
+    const col = document.createElement("div");
+    col.className = "produit-colonne";
+    col.dataset.idx = idx;
+
+    // Image
+    const imgHtml = product.image_url
+      ? `<img class="produit-img" src="${product.image_url}" alt="${product.name}">`
+      : `<div class="produit-img-placeholder">🥚</div>`;
+
+    // Badges
+    const badgesHtml = (product.labels_reconnus?.length > 0)
+      ? product.labels_reconnus.map(l =>
+          `<span class="badge ${classeBadge(l.type)}">${l.nom}</span>`
+        ).join("")
+      : `<span class="badge badge-inconnu">Aucun label reconnu</span>`;
+
+    col.innerHTML = `
+      <div class="produit-header">
+        ${imgHtml}
+        <div class="produit-meta">
           <h2>${product.name}</h2>
           <div class="marque">${product.brand}</div>
           <div class="badges">${badgesHtml}</div>
         </div>
+      </div>
+    `;
+
+    // Corps
+    const body = document.createElement("div");
+
+    if (!product.labels_reconnus?.length) {
+      body.innerHTML = `
+        <div class="alerte-no-label">
+          ⚠️ <strong>Aucun label reconnu</strong><br>
+          Tags détectés : ${product.labels_bruts || "aucun"}
+        </div>
       `;
+    } else {
+      const liste = document.createElement("div");
+      liste.className = "garanties-body";
+      liste.innerHTML = `<h3>Garanties certifiées</h3>`;
 
-      // Aucun label reconnu
-      if (!product.labels_reconnus?.length) {
-        document.getElementById("alerte-no-label").style.display = "block";
-        document.getElementById("garanties-section").style.display = "none";
-        document.getElementById("labels-bruts-alerte").textContent = product.labels_bruts || "aucun";
-        return;
-      }
+      const garantiesListe = document.createElement("div");
+      garantiesListe.className = "garanties-liste";
+      garantiesListe.dataset.prodIdx = idx;
 
-      document.getElementById("alerte-no-label").style.display = "none";
-      document.getElementById("garanties-section").style.display = "block";
-
-      // Tableau des garanties
-      const grille = document.getElementById("garanties-grille");
-      grille.innerHTML = "";
-
-      Object.entries(product.garanties || {}).forEach(([cle, data], idx) => {
+      Object.entries(product.garanties || {}).forEach(([cle, data], i) => {
         if (!data.valeur || data.valeur === "NS") return;
 
-        const idBulle = `bulle-${idx}`;
+        const idBulle = `bulle-${idx}-${i}`;
         const ligne = document.createElement("div");
         ligne.className = "garantie-ligne";
+        ligne.dataset.cle = cle;
 
         ligne.innerHTML = `
-          <div class="garantie-critere">${NOMS_CRITERES[cle] || cle}</div>
-          <div class="garantie-valeur">${data.valeur}</div>
-          <button class="btn-info" data-id="${idBulle}" aria-label="Source réglementaire">i</button>
+          <div>
+            <div class="garantie-critere">${NOMS_CRITERES[cle] || cle}</div>
+            <div class="garantie-valeur">${data.valeur}</div>
+          </div>
+          <button class="btn-info" data-id="${idBulle}">i</button>
           <div class="info-bulle" id="${idBulle}">
             ${data.label_source ? `<div class="info-label">📋 ${data.label_source}</div>` : ""}
             ${data.source && data.source !== "NS"
@@ -471,35 +792,75 @@
               : `<div class="info-source">Source non renseignée</div>`}
           </div>
         `;
-        grille.appendChild(ligne);
+        garantiesListe.appendChild(ligne);
       });
 
-      // Délégation d'événement pour les boutons i
-      grille.addEventListener("click", e => {
+      // Délégation d'événement bouton i
+      garantiesListe.addEventListener("click", e => {
         const btn = e.target.closest(".btn-info");
         if (!btn) return;
-
         const idCible = btn.dataset.id;
-        const bulle   = document.getElementById(idCible);
+        const bulle = document.getElementById(idCible);
 
-        // Fermer les autres bulles ouvertes
-        grille.querySelectorAll(".info-bulle.visible").forEach(b => {
+        garantiesListe.querySelectorAll(".info-bulle.visible").forEach(b => {
           if (b.id !== idCible) {
             b.classList.remove("visible");
             b.closest(".garantie-ligne").querySelector(".btn-info").classList.remove("actif");
           }
         });
-
-        // Ouvrir / fermer la bulle cliquée
-        const estOuverte = bulle.classList.contains("visible");
-        bulle.classList.toggle("visible", !estOuverte);
-        btn.classList.toggle("actif", !estOuverte);
+        bulle.classList.toggle("visible");
+        btn.classList.toggle("actif");
       });
 
+      liste.appendChild(garantiesListe);
+      body.appendChild(liste);
+
       // Debug
-      document.getElementById("debug-labels").textContent =
-        `labels_tags Open Food Facts : ${product.labels_bruts || "aucun"}`;
+      body.innerHTML += `
+        <details class="debug-section">
+          <summary>Données brutes</summary>
+          <p>labels_tags : ${product.labels_bruts || "aucun"}</p>
+        </details>
+      `;
     }
+
+    col.appendChild(body);
+    return col;
+  }
+
+  // ── Surlignage comparatif ────────────────────────────────────────────────
+  // Pour chaque critère commun, on identifie lequel des deux produits
+  // a la "meilleure" valeur (simplement : celui qui est renseigné si l'autre
+  // ne l'est pas, ou on laisse neutre si les deux ont une valeur)
+
+  function surligner() {
+    const colonnes = document.querySelectorAll(".produit-colonne");
+    if (colonnes.length < 2) return;
+
+    const lignesA = colonnes[0].querySelectorAll(".garantie-ligne[data-cle]");
+    const lignesB = colonnes[1].querySelectorAll(".garantie-ligne[data-cle]");
+
+    const mapA = {}, mapB = {};
+    lignesA.forEach(l => mapA[l.dataset.cle] = l);
+    lignesB.forEach(l => mapB[l.dataset.cle] = l);
+
+    // Critères présents dans A mais pas B → A est meilleur sur ce point
+    Object.keys(mapA).forEach(cle => {
+      if (!mapB[cle]) {
+        mapA[cle].classList.add("meilleur");
+      }
+    });
+
+    // Critères présents dans B mais pas A → B est meilleur sur ce point
+    Object.keys(mapB).forEach(cle => {
+      if (!mapA[cle]) {
+        mapB[cle].classList.add("meilleur");
+      }
+    });
+  }
+
+  // ── Init ──────────────────────────────────────────────────────────────────
+  mettreAJourSlots();
   </script>
 </body>
 </html>
