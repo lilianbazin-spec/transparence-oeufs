@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Transparence Alimentaire</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
@@ -20,179 +20,162 @@
       --rouge-clair: #fdecea;
       --rouge-bord:  #ef9a9a;
       --orange:      #e65100;
-      --ombre:       0 4px 24px rgba(26,74,46,0.10);
+      --ombre:       0 2px 12px rgba(26,74,46,0.10);
       --radius:      12px;
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { width: 100%; overflow-x: hidden; }
     body {
       font-family: 'DM Sans', sans-serif;
       background: var(--beige);
       color: var(--texte);
       min-height: 100vh;
-      padding-bottom: 80px;
+      padding-bottom: 60px;
+      font-size: 15px;
     }
 
-    /* ── En-tête ── */
+    /* ── Header ── */
     header {
       background: var(--vert-fonce);
-      padding: 20px 24px;
-      display: flex;
-      align-items: baseline;
-      gap: 12px;
+      padding: 16px 16px;
+      display: flex; align-items: baseline; gap: 10px;
     }
-    header h1 { font-family: 'DM Serif Display', serif; font-size: 1.5rem; color: var(--blanc); }
-    header .sous-titre { font-size: 0.8rem; color: var(--vert-accent); font-weight: 500; }
+    header h1 { font-family: 'DM Serif Display', serif; font-size: 1.3rem; color: var(--blanc); }
+    header .sous-titre { font-size: 0.75rem; color: var(--vert-accent); font-weight: 500; }
 
-    /* ── Zone scan ── */
-    .scan-zone { max-width: 600px; margin: 28px auto 0; padding: 0 16px; }
+    /* ── Scan card ── */
+    .scan-zone { width: 100%; max-width: 600px; margin: 20px auto 0; padding: 0 12px; }
     .scan-card {
-      background: var(--blanc);
-      border-radius: var(--radius);
-      padding: 24px;
-      box-shadow: var(--ombre);
-      border: 1px solid var(--beige-mid);
+      background: var(--blanc); border-radius: var(--radius);
+      padding: 18px 16px; box-shadow: var(--ombre); border: 1px solid var(--beige-mid);
     }
     .scan-card > label {
-      display: block;
-      font-size: 0.75rem;
-      font-weight: 600;
-      letter-spacing: 1.1px;
-      text-transform: uppercase;
-      color: var(--vert-mid);
-      margin-bottom: 10px;
+      display: block; font-size: 0.72rem; font-weight: 600;
+      letter-spacing: 1px; text-transform: uppercase;
+      color: var(--vert-mid); margin-bottom: 10px;
     }
 
     /* Slots */
-    .slot-indicateur { display: flex; gap: 8px; margin-bottom: 14px; }
+    .slot-indicateur { display: flex; gap: 8px; margin-bottom: 12px; }
     .slot-dot {
-      display: flex; align-items: center; gap: 6px;
-      padding: 5px 12px; border-radius: 20px;
+      flex: 1; text-align: center;
+      padding: 6px 8px; border-radius: 8px;
       font-size: 0.75rem; font-weight: 600;
       background: var(--beige-mid); color: var(--texte-doux);
-      border: 1.5px solid transparent;
-      transition: all 0.2s;
+      border: 1.5px solid transparent; transition: all 0.2s;
     }
     .slot-dot.actif  { background: var(--vert-clair); color: var(--vert-fonce); border-color: var(--vert-accent); }
     .slot-dot.rempli { background: var(--vert-fonce); color: var(--blanc); }
 
-    /* Rangée de boutons */
+    /* Scan row */
     .scan-row { display: flex; gap: 8px; }
     .scan-row input {
       flex: 1; min-width: 0;
-      padding: 12px 14px;
-      border: 1.5px solid var(--beige-mid);
-      border-radius: 8px;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 1rem;
-      color: var(--texte);
-      background: var(--beige);
-      outline: none;
+      padding: 12px 12px;
+      border: 1.5px solid var(--beige-mid); border-radius: 8px;
+      font-family: 'DM Sans', sans-serif; font-size: 1rem;
+      color: var(--texte); background: var(--beige); outline: none;
       transition: border-color 0.2s;
     }
     .scan-row input:focus   { border-color: var(--vert-accent); background: var(--blanc); }
-    .scan-row input:disabled { opacity: 0.45; cursor: not-allowed; }
+    .scan-row input:disabled { opacity: 0.4; cursor: not-allowed; }
 
     .btn {
-      padding: 12px 18px;
-      border: none; border-radius: 8px;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.9rem; font-weight: 600;
-      cursor: pointer;
-      transition: background 0.2s, transform 0.1s;
-      white-space: nowrap; flex-shrink: 0;
+      padding: 12px 14px; border: none; border-radius: 8px;
+      font-family: 'DM Sans', sans-serif; font-size: 0.88rem; font-weight: 600;
+      cursor: pointer; transition: background 0.2s, transform 0.1s;
+      white-space: nowrap; flex-shrink: 0; -webkit-tap-highlight-color: transparent;
     }
-    .btn:active   { transform: scale(0.97); }
-    .btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+    .btn:active   { transform: scale(0.96); }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
     .btn-primaire { background: var(--vert-fonce); color: var(--blanc); }
     .btn-primaire:hover:not(:disabled) { background: var(--vert-mid); }
     .btn-camera {
       background: var(--beige-mid); color: var(--vert-fonce);
-      border: 1.5px solid var(--beige-mid); font-size: 1.1rem; padding: 12px 14px;
+      border: 1.5px solid var(--beige-mid); font-size: 1.1rem; padding: 12px 13px;
     }
     .btn-camera:hover:not(:disabled) { background: var(--vert-clair); border-color: var(--vert-accent); }
     .btn-reset {
-      width: 100%; margin-top: 14px;
+      width: 100%; margin-top: 12px;
       background: #fff3e0; color: var(--orange);
       border: 1.5px solid #ffcc80; display: none;
+      padding: 11px;
     }
     .btn-reset:hover { background: #ffe0b2; }
     .btn-reset.visible { display: block; }
 
-    #status { margin-top: 12px; font-size: 0.88rem; color: var(--texte-doux); min-height: 20px; }
+    #status { margin-top: 10px; font-size: 0.85rem; color: var(--texte-doux); min-height: 18px; }
 
     /* ── Overlay caméra ── */
     #camera-overlay {
       display: none; position: fixed; inset: 0;
-      background: rgba(0,0,0,0.92); z-index: 1000;
-      flex-direction: column; align-items: center; justify-content: center; gap: 20px;
+      background: rgba(0,0,0,0.93); z-index: 1000;
+      flex-direction: column; align-items: center; justify-content: center; gap: 18px;
     }
     #camera-overlay.visible { display: flex; }
-    #camera-container {
-      position: relative;
-      width: min(90vw, 400px);
-      border-radius: 16px; overflow: hidden;
-      background: #000;
+    #qr-reader {
+      width: min(88vw, 360px) !important;
+      border-radius: 14px; overflow: hidden;
     }
-    /* html5-qrcode injecte une vidéo ici */
-    #camera-container video { width: 100% !important; border-radius: 16px; }
-    #camera-container img   { display: none; }       /* masquer le canvas de debug */
-    .camera-label { color: var(--blanc); font-size: 0.9rem; text-align: center; opacity: 0.85; }
+    #qr-reader video { border-radius: 14px; }
+    #qr-reader img   { display: none; }
+    .camera-label { color: var(--blanc); font-size: 0.88rem; text-align: center; opacity: 0.85; }
     #btn-fermer-camera {
       background: rgba(255,255,255,0.15); color: var(--blanc);
       border: 1.5px solid rgba(255,255,255,0.3); border-radius: 8px;
-      padding: 10px 28px;
-      font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 600;
-      cursor: pointer;
+      padding: 10px 32px; font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem; font-weight: 600; cursor: pointer;
     }
 
     /* ── Zone résultats ── */
-    #resultats { max-width: 1100px; margin: 28px auto 0; padding: 0 16px; }
+    #resultats { width: 100%; max-width: 900px; margin: 20px auto 0; padding: 0 12px; }
 
     .alerte-type {
       background: #fce4ec; border: 1px solid #f48fb1;
-      border-radius: var(--radius); padding: 16px 20px;
-      color: #880e4f; font-size: 0.9rem; margin-bottom: 20px;
-      display: none;
+      border-radius: var(--radius); padding: 14px 16px;
+      color: #880e4f; font-size: 0.88rem; margin-bottom: 16px; display: none;
+      line-height: 1.5;
     }
     .alerte-type.visible { display: block; }
 
-    /* ── En-têtes produits (au-dessus du tableau) ── */
+    /* ── En-têtes produits ── */
     .produits-headers {
       display: none;
-      background: var(--blanc);
       border-radius: var(--radius) var(--radius) 0 0;
-      border: 1px solid var(--beige-mid);
-      border-bottom: none;
-      box-shadow: var(--ombre);
+      border: 1px solid var(--beige-mid); border-bottom: none;
+      background: var(--blanc); box-shadow: var(--ombre);
+      overflow: hidden;
     }
-    .produits-headers.visible { display: grid; grid-template-columns: 180px 1fr 1fr; }
+    .produits-headers.visible {
+      display: grid;
+    }
+    /* 1 produit */
+    .produits-headers.un-produit  { grid-template-columns: 110px 1fr; }
+    /* 2 produits */
+    .produits-headers.deux-produits { grid-template-columns: 110px 1fr 1fr; }
 
-    .produit-header-vide { padding: 16px; }
-
+    .header-vide { background: var(--beige); border-right: 1px solid var(--beige-mid); }
     .produit-header-col {
-      padding: 16px;
-      border-left: 1px solid var(--beige-mid);
-      display: flex; align-items: flex-start; gap: 12px;
+      padding: 14px 12px; border-left: 1px solid var(--beige-mid);
+      display: flex; align-items: flex-start; gap: 10px;
     }
     .produit-img {
-      width: 60px; height: 60px;
-      object-fit: contain; border-radius: 8px;
-      background: var(--beige); border: 1px solid var(--beige-mid);
-      flex-shrink: 0;
+      width: 56px; height: 56px; object-fit: contain;
+      border-radius: 8px; background: var(--beige);
+      border: 1px solid var(--beige-mid); flex-shrink: 0;
     }
     .produit-img-placeholder {
-      width: 60px; height: 60px;
-      background: var(--beige-mid); border-radius: 8px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.4rem; flex-shrink: 0;
+      width: 56px; height: 56px; background: var(--beige-mid);
+      border-radius: 8px; display: flex; align-items: center;
+      justify-content: center; font-size: 1.4rem; flex-shrink: 0;
     }
     .produit-meta h2 {
-      font-family: 'DM Serif Display', serif;
-      font-size: 0.95rem; margin-bottom: 3px; line-height: 1.3;
+      font-family: 'DM Serif Display', serif; font-size: 0.9rem;
+      margin-bottom: 2px; line-height: 1.3;
     }
-    .produit-meta .marque { font-size: 0.78rem; color: var(--texte-doux); margin-bottom: 6px; }
-    .badges { display: flex; flex-wrap: wrap; gap: 5px; }
-    .badge { padding: 3px 8px; border-radius: 20px; font-size: 0.68rem; font-weight: 600; }
+    .produit-meta .marque { font-size: 0.75rem; color: var(--texte-doux); margin-bottom: 6px; }
+    .badges { display: flex; flex-wrap: wrap; gap: 4px; }
+    .badge { padding: 3px 8px; border-radius: 20px; font-size: 0.65rem; font-weight: 600; }
     .badge-bio     { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
     .badge-lr      { background: #fff3e0; color: #e65100; border: 1px solid #ffcc80; }
     .badge-igp     { background: #e3f2fd; color: #1565c0; border: 1px solid #90caf9; }
@@ -200,561 +183,574 @@
     .badge-code    { background: #f5f5f5; color: #424242; border: 1px solid #bdbdbd; }
     .badge-inconnu { background: var(--beige-mid); color: var(--texte-doux); border: 1px solid #ddd; }
 
-    /* ── Tableau comparatif ── */
+    /* ── Tableau ── */
     .tableau-comparatif {
       display: none;
       background: var(--blanc);
-      border-radius: 0 0 var(--radius) var(--radius);
       border: 1px solid var(--beige-mid);
+      border-top: none;
       box-shadow: var(--ombre);
       overflow: hidden;
     }
     .tableau-comparatif.visible { display: block; }
+    .tableau-comparatif.seul { border-radius: 0 0 var(--radius) var(--radius); }
+    .tableau-comparatif.seul + .produits-headers,
+    .produits-headers.seul { border-radius: var(--radius); }
 
-    /* Quand un seul produit : arrondi complet */
-    .tableau-comparatif.seul {
-      border-radius: var(--radius);
+    /* Bouton "Plus d'infos" */
+    .btn-plus-infos {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%; padding: 12px;
+      background: var(--beige); border: none; border-top: 1px solid var(--beige-mid);
+      font-family: 'DM Sans', sans-serif; font-size: 0.82rem; font-weight: 600;
+      color: var(--vert-mid); cursor: pointer;
+      transition: background 0.15s;
+      -webkit-tap-highlight-color: transparent;
     }
-    .produits-headers.seul {
-      border-radius: var(--radius) var(--radius) 0 0;
-    }
+    .btn-plus-infos:hover { background: var(--vert-clair); }
+    .btn-plus-infos .fleche { transition: transform 0.2s; display: inline-block; }
+    .btn-plus-infos.ouvert .fleche { transform: rotate(180deg); }
+
+    /* Bloc critères secondaires */
+    .criteres-secondaires { display: none; }
+    .criteres-secondaires.visible { display: block; }
 
     /* Lignes du tableau */
     .tableau-ligne {
       display: grid;
-      border-bottom: 1px solid var(--beige-mid);
+      border-top: 1px solid var(--beige-mid);
     }
-    .tableau-ligne:last-child { border-bottom: none; }
+    .un-produit   .tableau-ligne { grid-template-columns: 110px 1fr; }
+    .deux-produits .tableau-ligne { grid-template-columns: 110px 1fr 1fr; }
 
-    /* 1 produit : 2 colonnes */
-    .tableau-ligne.col-1 { grid-template-columns: 180px 1fr; }
-    /* 2 produits : 3 colonnes */
-    .tableau-ligne.col-2 { grid-template-columns: 180px 1fr 1fr; }
+    /* Appliquer les colonnes via classe sur le tableau aussi */
+    .tableau-comparatif.un-produit   .tableau-ligne { grid-template-columns: 110px 1fr; }
+    .tableau-comparatif.deux-produits .tableau-ligne { grid-template-columns: 110px 1fr 1fr; }
 
-    .tableau-ligne:hover { background: #f9f9f7; }
+    .tableau-ligne:hover { background: #f8f8f6; }
 
     .cell-critere {
-      padding: 12px 14px;
-      font-size: 0.72rem;
-      font-weight: 700;
-      color: var(--vert-mid);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+      padding: 11px 10px;
+      font-size: 0.68rem; font-weight: 700;
+      color: var(--vert-mid); text-transform: uppercase; letter-spacing: 0.4px;
       border-right: 1px solid var(--beige-mid);
-      display: flex; align-items: center;
       background: var(--beige);
+      display: flex; align-items: center;
+      line-height: 1.3;
     }
-
     .cell-valeur {
-      padding: 11px 14px;
-      font-size: 0.87rem;
-      color: var(--texte);
-      line-height: 1.45;
+      padding: 10px 10px;
+      font-size: 0.84rem; color: var(--texte); line-height: 1.4;
       border-right: 1px solid var(--beige-mid);
-      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      display: flex; align-items: center; justify-content: space-between; gap: 6px;
     }
     .cell-valeur:last-child { border-right: none; }
-
-    /* Non renseigné */
-    .cell-valeur.ns {
-      color: var(--texte-doux);
-      font-style: italic;
-      background: #fafafa;
-    }
-
-    /* Surlignage comparatif */
-    .cell-valeur.meilleur {
-      background: var(--vert-clair);
-      color: var(--vert-fonce);
-      font-weight: 500;
-    }
-    .cell-valeur.moins-bien {
-      background: var(--rouge-clair);
-      color: #b71c1c;
-    }
+    .cell-valeur.ns { color: var(--texte-doux); font-style: italic; background: #fafafa; font-size: 0.8rem; }
+    .cell-valeur.meilleur   { background: var(--vert-clair); color: var(--vert-fonce); font-weight: 500; }
+    .cell-valeur.moins-bien { background: var(--rouge-clair); color: #b71c1c; }
 
     /* Bouton i */
     .btn-info {
       width: 22px; height: 22px; flex-shrink: 0;
-      border-radius: 50%;
-      border: 1.5px solid var(--beige-mid);
-      background: var(--blanc);
-      color: var(--texte-doux);
-      font-size: 0.72rem; font-weight: 700;
-      font-style: italic; font-family: Georgia, serif;
-      cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
+      border-radius: 50%; border: 1.5px solid var(--beige-mid);
+      background: var(--blanc); color: var(--texte-doux);
+      font-size: 0.7rem; font-weight: 700; font-style: italic; font-family: Georgia, serif;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
       transition: background 0.15s, border-color 0.15s, color 0.15s;
+      -webkit-tap-highlight-color: transparent;
     }
     .btn-info:hover { background: var(--vert-clair); border-color: var(--vert-accent); color: var(--vert-fonce); }
     .btn-info.actif { background: var(--vert-fonce); border-color: var(--vert-fonce); color: var(--blanc); }
     .cell-valeur.ns .btn-info { display: none; }
 
-    /* Bulle d'info — s'étend sur toute la ligne */
+    /* Bulle */
     .bulle-ligne {
-      display: none;
-      grid-column: 2 / -1;
-      background: var(--vert-clair);
-      border-top: 1px solid var(--vert-accent);
-      border-bottom: 1px solid var(--vert-accent);
-      padding: 10px 14px;
-      font-size: 0.78rem;
-      color: var(--vert-fonce);
-      line-height: 1.6;
+      display: none; grid-column: 2 / -1;
+      background: var(--vert-clair); border-top: 1px solid var(--vert-accent);
+      padding: 10px 12px; font-size: 0.78rem; color: var(--vert-fonce); line-height: 1.6;
     }
     .bulle-ligne.visible { display: block; }
     .bulle-ligne .info-label  { font-weight: 600; margin-bottom: 2px; }
     .bulle-ligne .info-source { font-style: italic; color: var(--vert-mid); }
 
-    /* Section debug */
-    .debug-section {
-      margin: 12px 16px 16px;
-      background: var(--beige-mid); border-radius: 8px; padding: 10px 14px;
+    /* Alerte aucun label */
+    .alerte-no-label {
+      padding: 14px 12px;
+      background: #fff8e1; border-top: 1px solid #ffe082;
+      color: #5d4037; font-size: 0.84rem; line-height: 1.5;
     }
-    .debug-section summary { font-size: 0.72rem; font-weight: 600; color: var(--texte-doux); cursor: pointer; text-transform: uppercase; }
-    .debug-section p { font-size: 0.72rem; color: var(--texte-doux); margin-top: 8px; font-family: monospace; line-height: 1.5; }
 
-    /* ── Responsive mobile ── */
-    @media (max-width: 600px) {
-      .produits-headers.visible,
-      .tableau-ligne.col-2 {
-        grid-template-columns: 100px 1fr 1fr;
-      }
-      .cell-critere { font-size: 0.65rem; padding: 10px 8px; }
-      .cell-valeur  { font-size: 0.82rem; padding: 10px 8px; }
-      .produit-header-col { padding: 12px 8px; gap: 8px; }
+    /* Debug */
+    .debug-wrap { border-top: 1px solid var(--beige-mid); }
+    .debug-section {
+      background: var(--beige-mid); padding: 10px 14px;
+      border-top: 1px solid var(--beige-mid);
     }
+    .debug-section summary { font-size: 0.7rem; font-weight: 600; color: var(--texte-doux); cursor: pointer; text-transform: uppercase; }
+    .debug-section p { font-size: 0.7rem; color: var(--texte-doux); margin-top: 6px; font-family: monospace; line-height: 1.5; word-break: break-all; }
+
+    /* Pied de tableau arrondi */
+    .tableau-comparatif.visible { border-radius: 0 0 var(--radius) var(--radius); }
   </style>
 </head>
 <body>
 
-  <header>
-    <h1>🥚 Transparence Alimentaire</h1>
-    <span class="sous-titre">Garanties certifiées par label</span>
-  </header>
+<header>
+  <h1>🥚 Transparence Alimentaire</h1>
+  <span class="sous-titre">Garanties certifiées par label</span>
+</header>
 
-  <div class="scan-zone">
-    <div class="scan-card">
-      <label>Scan produit</label>
-      <div class="slot-indicateur">
-        <div class="slot-dot" id="dot-1">① Produit A</div>
-        <div class="slot-dot" id="dot-2">② Produit B</div>
-      </div>
-      <div class="scan-row">
-        <input type="text" id="barcode" placeholder="Code-barres…" inputmode="numeric">
-        <button class="btn btn-camera" id="btn-camera" title="Scanner avec la caméra">📷</button>
-        <button class="btn btn-primaire" id="btn-analyser">Analyser</button>
-      </div>
-      <button class="btn btn-reset" id="btn-reset">🔄 Nouvelle comparaison</button>
-      <div id="status"></div>
+<div class="scan-zone">
+  <div class="scan-card">
+    <label>Scan produit</label>
+    <div class="slot-indicateur">
+      <div class="slot-dot" id="dot-1">① Produit A</div>
+      <div class="slot-dot" id="dot-2">② Produit B</div>
     </div>
-  </div>
-
-  <!-- Overlay caméra -->
-  <div id="camera-overlay">
-    <div id="camera-container">
-      <div id="qr-reader"></div>
+    <div class="scan-row">
+      <input type="text" id="barcode" placeholder="Code-barres…" inputmode="numeric">
+      <button class="btn btn-camera" id="btn-camera">📷</button>
+      <button class="btn btn-primaire" id="btn-analyser">Analyser</button>
     </div>
-    <div class="camera-label">Pointez le code-barres dans le cadre vert</div>
-    <button id="btn-fermer-camera">Annuler</button>
+    <button class="btn btn-reset" id="btn-reset">🔄 Nouvelle comparaison</button>
+    <div id="status"></div>
   </div>
+</div>
 
-  <div id="resultats">
-    <div class="alerte-type" id="alerte-type">
-      ⚠️ <strong>Comparaison non pertinente</strong> — ces deux produits ne sont pas de la même catégorie.<br>
-      <span id="alerte-type-detail"></span>
-    </div>
+<!-- Overlay caméra -->
+<div id="camera-overlay">
+  <div id="qr-reader"></div>
+  <div class="camera-label">Pointez le code-barres dans le cadre</div>
+  <button id="btn-fermer-camera">Annuler</button>
+</div>
 
-    <!-- En-têtes produits -->
-    <div class="produits-headers" id="produits-headers"></div>
-
-    <!-- Tableau comparatif -->
-    <div class="tableau-comparatif" id="tableau-comparatif"></div>
+<div id="resultats">
+  <div class="alerte-type" id="alerte-type">
+    ⚠️ <strong>Comparaison non pertinente</strong> — catégories différentes.<br>
+    <span id="alerte-type-detail"></span>
   </div>
+  <div class="produits-headers" id="produits-headers"></div>
+  <div class="tableau-comparatif" id="tableau-comparatif"></div>
+</div>
 
+<script>
+// ═══════════════════════════════════════════════════════════════════════
+// CONFIG
+// ═══════════════════════════════════════════════════════════════════════
 
-  <script>
-  // ═══════════════════════════════════════════════════════════════════════
-  // CONFIG
-  // ═══════════════════════════════════════════════════════════════════════
+const API_BASE = "";
 
-  const API_BASE = "";
+// Critères principaux (toujours visibles)
+const CRITERES_PRINCIPAUX = [
+  "alimentation",
+  "condition_elevage",
+  "acces_exterieur",
+  "densite_batiment",
+  "surface_max_batiment",
+  "surface_max_site",
+  "effectif_par_elevage",
+  "vide_sanitaire_batiment",
+  "age_max_poules",
+  "age_min_abattage",
+  "aire_geographique",
+  "frequence_ramassage",
+];
 
-  const NOMS_CRITERES = {
-    alimentation:            "Alimentation",
-    condition_elevage:       "Condition d'élevage",
-    acces_exterieur:         "Accès extérieur",
-    exterieur:               "Extérieur",
-    densite_batiment:        "Densité bâtiment",
-    effectif_max_batiment:   "Effectif / bâtiment",
-    surface_max_batiment:    "Surface bâtiment",
-    surface_max_site:        "Surface site",
-    effectif_par_elevage:    "Effectif élevage",
-    parcours_exterieur:      "Parcours extérieur",
-    surface_parcours:        "Surface parcours",
-    vide_sanitaire_batiment: "Vide sanitaire bât.",
-    vide_sanitaire_parcours: "Vide sanitaire parc.",
-    age_max_poules:          "Âge max poules",
-    age_min_abattage:        "Âge min abattage",
-    aire_geographique:       "Aire géographique",
-    frequence_ramassage:     "Fréquence ramassage",
-  };
+// Critères secondaires (masqués derrière "Plus d'informations")
+const CRITERES_SECONDAIRES = [
+  "exterieur",
+  "effectif_max_batiment",
+  "parcours_exterieur",
+  "surface_parcours",
+  "vide_sanitaire_batiment",
+  "vide_sanitaire_parcours",
+];
 
-  // Critères comparables numériquement : on extrait le nombre et on compare
-  // "plus grand = meilleur" ou "plus petit = meilleur" selon le critère
-  const CRITERES_COMPARABLES = {
-    // Plus petit = plus restrictif (moins dense = mieux pour les poules)
-    densite_batiment:        "min",
-    effectif_max_batiment:   "min",
-    surface_max_batiment:    "min",
-    surface_max_site:        "min",
-    effectif_par_elevage:    "min",
-    // Plus grand = plus restrictif (plus de place dehors = mieux)
-    surface_parcours:        "max",
-    parcours_exterieur:      "max",
-    // Plus grand = plus restrictif (vide sanitaire plus long = mieux)
-    vide_sanitaire_batiment: "max",
-    vide_sanitaire_parcours: "max",
-  };
+const NOMS_CRITERES = {
+  alimentation:            "Alimentation",
+  condition_elevage:       "Condition d'élevage",
+  acces_exterieur:         "Accès extérieur",
+  exterieur:               "Extérieur",
+  densite_batiment:        "Densité bâtiment",
+  effectif_max_batiment:   "Effectif / bâtiment",
+  surface_max_batiment:    "Surface bâtiment",
+  surface_max_site:        "Surface site",
+  effectif_par_elevage:    "Effectif élevage",
+  parcours_exterieur:      "Parcours extérieur",
+  surface_parcours:        "Surface parcours",
+  vide_sanitaire_batiment: "Vide sanitaire bât.",
+  vide_sanitaire_parcours: "Vide sanitaire parc.",
+  age_max_poules:          "Âge max poules",
+  age_min_abattage:        "Âge min abattage",
+  aire_geographique:       "Aire géographique",
+  frequence_ramassage:     "Fréquence ramassage",
+};
 
-  const CATEGORIES_CONNUES = [
-    { id: "oeufs",  mots: ["oeuf", "œuf", "egg"] },
-    { id: "poulet", mots: ["poulet", "chicken", "volaille"] },
-    { id: "boeuf",  mots: ["boeuf", "bœuf", "beef", "bovin"] },
-    { id: "porc",   mots: ["porc", "pork", "cochon"] },
-    { id: "agneau", mots: ["agneau", "lamb", "ovin"] },
-    { id: "saumon", mots: ["saumon", "salmon"] },
-    { id: "lait",   mots: ["lait", "milk"] },
-  ];
+// Critères comparables numériquement (min = plus petit est meilleur, max = plus grand est meilleur)
+const CRITERES_COMPARABLES = {
+  densite_batiment:        "min",
+  effectif_max_batiment:   "min",
+  surface_max_batiment:    "min",
+  surface_max_site:        "min",
+  effectif_par_elevage:    "min",
+  surface_parcours:        "max",
+  parcours_exterieur:      "max",
+  vide_sanitaire_batiment: "max",
+  vide_sanitaire_parcours: "max",
+};
 
-  function detecterCategorie(product) {
-    const texte = [(product.name||""), (product.categories||"")].join(" ").toLowerCase();
-    for (const cat of CATEGORIES_CONNUES) {
-      if (cat.mots.some(m => texte.includes(m))) return cat.id;
+const CATEGORIES_CONNUES = [
+  { id: "oeufs",  mots: ["oeuf", "œuf", "egg"] },
+  { id: "poulet", mots: ["poulet", "chicken", "volaille"] },
+  { id: "boeuf",  mots: ["boeuf", "bœuf", "beef", "bovin"] },
+  { id: "porc",   mots: ["porc", "pork", "cochon"] },
+  { id: "agneau", mots: ["agneau", "lamb", "ovin"] },
+  { id: "saumon", mots: ["saumon", "salmon"] },
+  { id: "lait",   mots: ["lait", "milk"] },
+];
+
+function detecterCategorie(p) {
+  const t = [(p.name||""), (p.categories||"")].join(" ").toLowerCase();
+  for (const c of CATEGORIES_CONNUES) if (c.mots.some(m => t.includes(m))) return c.id;
+  return null;
+}
+
+function classeBadge(type) {
+  if (!type) return "badge-inconnu";
+  const t = type.toLowerCase();
+  if (t.includes("code réglementaire")) return "badge-code";
+  if (t.includes("bio") && !t.includes("privé")) return "badge-bio";
+  if (t.includes("label rouge") || t.includes("inao")) return "badge-lr";
+  if (t.includes("igp") || t.includes("aop")) return "badge-igp";
+  return "badge-prive";
+}
+
+function extraireNombre(str) {
+  if (!str || str === "NS") return null;
+  const m = str.match(/\d+(?:[.,]\d+)?/);
+  return m ? parseFloat(m[0].replace(",", ".")) : null;
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// ÉTAT
+// ═══════════════════════════════════════════════════════════════════════
+
+let produits     = [null, null];
+let slotActif    = 0;
+let html5QrCode  = null;
+let scannerOuvert = false;
+let bulleOuverte  = null;
+
+// ═══════════════════════════════════════════════════════════════════════
+// UI
+// ═══════════════════════════════════════════════════════════════════════
+
+function setStatus(msg) { document.getElementById("status").textContent = msg; }
+
+function mettreAJourSlots() {
+  document.getElementById("dot-1").className =
+    "slot-dot" + (produits[0] ? " rempli" : (slotActif === 0 ? " actif" : ""));
+  document.getElementById("dot-2").className =
+    "slot-dot" + (produits[1] ? " rempli" : (slotActif === 1 ? " actif" : ""));
+
+  const bloque = !!(produits[0] && produits[1]);
+  document.getElementById("barcode").disabled      = bloque;
+  document.getElementById("btn-analyser").disabled = bloque;
+  document.getElementById("btn-camera").disabled   = bloque;
+  document.getElementById("btn-reset").classList.toggle("visible", bloque);
+
+  if (!bloque)
+    document.getElementById("barcode").placeholder =
+      slotActif === 0 ? "Code-barres Produit A…" : "Code-barres Produit B…";
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// CAMÉRA
+// ═══════════════════════════════════════════════════════════════════════
+
+document.getElementById("btn-camera").addEventListener("click", ouvrirCamera);
+document.getElementById("btn-fermer-camera").addEventListener("click", fermerCamera);
+
+async function ouvrirCamera() {
+  if (scannerOuvert) return;
+  document.getElementById("camera-overlay").classList.add("visible");
+  scannerOuvert = true;
+  try {
+    html5QrCode = new Html5Qrcode("qr-reader");
+    await html5QrCode.start(
+      { facingMode: "environment" },
+      {
+        fps: 10,
+        qrbox: { width: 240, height: 150 },
+        aspectRatio: 1.5,
+        formatsToSupport: [
+          Html5QrcodeSupportedFormats.EAN_13,
+          Html5QrcodeSupportedFormats.EAN_8,
+          Html5QrcodeSupportedFormats.UPC_A,
+          Html5QrcodeSupportedFormats.UPC_E,
+          Html5QrcodeSupportedFormats.CODE_128,
+        ],
+      },
+      (code) => { fermerCamera(); document.getElementById("barcode").value = code; lancerRecherche(code); },
+      () => {}
+    );
+  } catch (err) {
+    fermerCamera();
+    setStatus(err.toString().includes("NotAllowed")
+      ? "⚠️ Accès caméra refusé — autorisez-le dans les réglages."
+      : "⚠️ Impossible d'ouvrir la caméra.");
+  }
+}
+
+async function fermerCamera() {
+  scannerOuvert = false;
+  document.getElementById("camera-overlay").classList.remove("visible");
+  if (html5QrCode) { try { await html5QrCode.stop(); } catch {} html5QrCode = null; }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// SCAN MANUEL
+// ═══════════════════════════════════════════════════════════════════════
+
+document.getElementById("btn-analyser").addEventListener("click", () => {
+  const v = document.getElementById("barcode").value.trim();
+  v ? lancerRecherche(v) : setStatus("⚠️ Merci d'entrer un code-barres.");
+});
+document.getElementById("barcode").addEventListener("keydown", e => {
+  if (e.key === "Enter") { const v = document.getElementById("barcode").value.trim(); if (v) lancerRecherche(v); }
+});
+
+// ═══════════════════════════════════════════════════════════════════════
+// RESET
+// ═══════════════════════════════════════════════════════════════════════
+
+document.getElementById("btn-reset").addEventListener("click", () => {
+  produits = [null, null]; slotActif = 0; bulleOuverte = null;
+  document.getElementById("barcode").value = "";
+  document.getElementById("produits-headers").className = "produits-headers";
+  document.getElementById("produits-headers").innerHTML = "";
+  document.getElementById("tableau-comparatif").className = "tableau-comparatif";
+  document.getElementById("tableau-comparatif").innerHTML = "";
+  document.getElementById("alerte-type").classList.remove("visible");
+  setStatus(""); mettreAJourSlots();
+});
+
+// ═══════════════════════════════════════════════════════════════════════
+// RECHERCHE
+// ═══════════════════════════════════════════════════════════════════════
+
+async function lancerRecherche(barcode) {
+  setStatus("Recherche en cours…");
+  document.getElementById("btn-analyser").disabled = true;
+  document.getElementById("btn-camera").disabled   = true;
+
+  try {
+    const res  = await fetch(`${API_BASE}/scan/${barcode}`);
+    if (!res.ok) throw new Error();
+    const data = await res.json();
+
+    document.getElementById("btn-analyser").disabled = false;
+    document.getElementById("btn-camera").disabled   = false;
+
+    if (!data.found) { setStatus(`⚠️ ${data.message}`); return; }
+
+    setStatus(""); document.getElementById("barcode").value = "";
+    produits[slotActif] = data.product;
+
+    // Vérif compatibilité
+    if (slotActif === 1 && produits[0] && produits[1]) {
+      const cA = detecterCategorie(produits[0]);
+      const cB = detecterCategorie(produits[1]);
+      const al = document.getElementById("alerte-type");
+      if (cA && cB && cA !== cB) {
+        document.getElementById("alerte-type-detail").textContent =
+          `Produit A : "${cA}" — Produit B : "${cB}"`;
+        al.classList.add("visible");
+      } else { al.classList.remove("visible"); }
     }
-    return null;
-  }
 
-  function classeBadge(type) {
-    if (!type) return "badge-inconnu";
-    const t = type.toLowerCase();
-    if (t.includes("code réglementaire")) return "badge-code";
-    if (t.includes("bio") && !t.includes("privé")) return "badge-bio";
-    if (t.includes("label rouge") || t.includes("inao")) return "badge-lr";
-    if (t.includes("igp") || t.includes("aop")) return "badge-igp";
-    return "badge-prive";
-  }
-
-  // Extrait le premier nombre trouvé dans une chaîne ("≤ 9 poules/m²" → 9)
-  function extraireNombre(str) {
-    if (!str || str === "NS") return null;
-    const m = str.match(/[\d]+(?:[.,]\d+)?/);
-    return m ? parseFloat(m[0].replace(",", ".")) : null;
-  }
-
-  // ═══════════════════════════════════════════════════════════════════════
-  // ÉTAT
-  // ═══════════════════════════════════════════════════════════════════════
-
-  let produits  = [null, null];
-  let slotActif = 0;
-  let html5QrCode = null;
-  let scannerOuvert = false;
-
-  // ═══════════════════════════════════════════════════════════════════════
-  // UI
-  // ═══════════════════════════════════════════════════════════════════════
-
-  function setStatus(msg) { document.getElementById("status").textContent = msg; }
-
-  function mettreAJourSlots() {
-    document.getElementById("dot-1").className =
-      "slot-dot" + (produits[0] ? " rempli" : (slotActif === 0 ? " actif" : ""));
-    document.getElementById("dot-2").className =
-      "slot-dot" + (produits[1] ? " rempli" : (slotActif === 1 ? " actif" : ""));
-
-    const bloque = produits[0] && produits[1];
-    document.getElementById("barcode").disabled    = bloque;
-    document.getElementById("btn-analyser").disabled = bloque;
-    document.getElementById("btn-camera").disabled   = bloque;
-    document.getElementById("btn-reset").classList.toggle("visible", !!bloque);
-
-    if (!bloque) {
-      document.getElementById("barcode").placeholder =
-        slotActif === 0 ? "Scanner le Produit A…" : "Scanner le Produit B…";
-    }
-  }
-
-  // ═══════════════════════════════════════════════════════════════════════
-  // CAMÉRA — html5-qrcode
-  // ═══════════════════════════════════════════════════════════════════════
-
-  document.getElementById("btn-camera").addEventListener("click", ouvrirCamera);
-  document.getElementById("btn-fermer-camera").addEventListener("click", fermerCamera);
-
-  async function ouvrirCamera() {
-    if (scannerOuvert) return;
-    document.getElementById("camera-overlay").classList.add("visible");
-    scannerOuvert = true;
-
-    try {
-      html5QrCode = new Html5Qrcode("qr-reader");
-
-      await html5QrCode.start(
-        { facingMode: "environment" },   // caméra arrière
-        {
-          fps: 10,
-          qrbox: { width: 250, height: 160 },
-          aspectRatio: 1.5,
-          formatsToSupport: [
-            Html5QrcodeSupportedFormats.EAN_13,
-            Html5QrcodeSupportedFormats.EAN_8,
-            Html5QrcodeSupportedFormats.UPC_A,
-            Html5QrcodeSupportedFormats.UPC_E,
-            Html5QrcodeSupportedFormats.CODE_128,
-          ],
-        },
-        (decodedText) => {
-          fermerCamera();
-          document.getElementById("barcode").value = decodedText;
-          lancerRecherche(decodedText);
-        },
-        () => {}   // erreurs de scan ignorées
-      );
-    } catch (err) {
-      fermerCamera();
-      if (err.toString().includes("NotAllowed")) {
-        setStatus("⚠️ Accès caméra refusé. Autorisez-le dans les réglages du navigateur.");
-      } else {
-        setStatus("⚠️ Impossible d'ouvrir la caméra : " + err);
-      }
-    }
-  }
-
-  async function fermerCamera() {
-    scannerOuvert = false;
-    document.getElementById("camera-overlay").classList.remove("visible");
-    if (html5QrCode) {
-      try { await html5QrCode.stop(); } catch {}
-      html5QrCode = null;
-    }
-  }
-
-  // ═══════════════════════════════════════════════════════════════════════
-  // SCAN MANUEL
-  // ═══════════════════════════════════════════════════════════════════════
-
-  document.getElementById("btn-analyser").addEventListener("click", () => {
-    const v = document.getElementById("barcode").value.trim();
-    v ? lancerRecherche(v) : setStatus("⚠️ Merci d'entrer un code-barres.");
-  });
-  document.getElementById("barcode").addEventListener("keydown", e => {
-    if (e.key === "Enter") {
-      const v = document.getElementById("barcode").value.trim();
-      if (v) lancerRecherche(v);
-    }
-  });
-
-  // ═══════════════════════════════════════════════════════════════════════
-  // RESET
-  // ═══════════════════════════════════════════════════════════════════════
-
-  document.getElementById("btn-reset").addEventListener("click", () => {
-    produits  = [null, null];
-    slotActif = 0;
-    document.getElementById("barcode").value = "";
-    document.getElementById("produits-headers").className   = "produits-headers";
-    document.getElementById("produits-headers").innerHTML   = "";
-    document.getElementById("tableau-comparatif").className = "tableau-comparatif";
-    document.getElementById("tableau-comparatif").innerHTML = "";
-    document.getElementById("alerte-type").classList.remove("visible");
-    setStatus("");
+    if (slotActif === 0) slotActif = 1;
     mettreAJourSlots();
+    afficherTableau();
+
+  } catch {
+    setStatus("⚠️ Impossible de contacter le serveur.");
+    document.getElementById("btn-analyser").disabled = false;
+    document.getElementById("btn-camera").disabled   = false;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// AFFICHAGE TABLEAU
+// ═══════════════════════════════════════════════════════════════════════
+
+function afficherTableau() {
+  const pA = produits[0];
+  const pB = produits[1];
+  const deux = !!(pA && pB);
+  const colCls = deux ? "deux-produits" : "un-produit";
+
+  // ── En-têtes ─────────────────────────────────────────────────────────
+  const headEl = document.getElementById("produits-headers");
+  headEl.className = `produits-headers visible ${colCls}`;
+  headEl.innerHTML = `<div class="header-vide"></div>`;
+
+  [pA, pB].forEach(p => {
+    if (!p) return;
+    const img = p.image_url
+      ? `<img class="produit-img" src="${p.image_url}" alt="">`
+      : `<div class="produit-img-placeholder">🥚</div>`;
+    const badges = p.labels_reconnus?.length
+      ? p.labels_reconnus.map(l => `<span class="badge ${classeBadge(l.type)}">${l.nom}</span>`).join("")
+      : `<span class="badge badge-inconnu">Aucun label</span>`;
+    headEl.innerHTML += `
+      <div class="produit-header-col">
+        ${img}
+        <div class="produit-meta">
+          <h2>${p.name}</h2>
+          <div class="marque">${p.brand}</div>
+          <div class="badges">${badges}</div>
+        </div>
+      </div>`;
   });
 
-  // ═══════════════════════════════════════════════════════════════════════
-  // RECHERCHE API
-  // ═══════════════════════════════════════════════════════════════════════
+  // ── Corps ─────────────────────────────────────────────────────────────
+  const tabEl = document.getElementById("tableau-comparatif");
+  tabEl.className = `tableau-comparatif visible ${colCls}`;
+  tabEl.innerHTML = "";
+  bulleOuverte = null;
 
-  async function lancerRecherche(barcode) {
-    setStatus("Recherche en cours…");
-    document.getElementById("btn-analyser").disabled = true;
-    document.getElementById("btn-camera").disabled   = true;
+  // Aucun label ?
+  const aucunLabelA = pA && (!pA.labels_reconnus?.length);
+  const aucunLabelB = pB && (!pB.labels_reconnus?.length);
 
-    try {
-      const res  = await fetch(`${API_BASE}/scan/${barcode}`);
-      if (!res.ok) throw new Error();
-      const data = await res.json();
-
-      document.getElementById("btn-analyser").disabled = false;
-      document.getElementById("btn-camera").disabled   = false;
-
-      if (!data.found) { setStatus(`⚠️ ${data.message}`); return; }
-
-      setStatus("");
-      document.getElementById("barcode").value = "";
-
-      produits[slotActif] = data.product;
-
-      // Vérification compatibilité
-      if (slotActif === 1 && produits[0] && produits[1]) {
-        const cA = detecterCategorie(produits[0]);
-        const cB = detecterCategorie(produits[1]);
-        const alerteEl = document.getElementById("alerte-type");
-        if (cA && cB && cA !== cB) {
-          document.getElementById("alerte-type-detail").textContent =
-            `Produit A : "${cA}" — Produit B : "${cB}"`;
-          alerteEl.classList.add("visible");
-        } else {
-          alerteEl.classList.remove("visible");
-        }
-      }
-
-      if (slotActif === 0) slotActif = 1;
-      mettreAJourSlots();
-      afficherTableau();
-
-    } catch {
-      setStatus("⚠️ Impossible de contacter le serveur.");
-      document.getElementById("btn-analyser").disabled = false;
-      document.getElementById("btn-camera").disabled   = false;
-    }
-  }
-
-  // ═══════════════════════════════════════════════════════════════════════
-  // AFFICHAGE — TABLEAU COMPARATIF
-  // ═══════════════════════════════════════════════════════════════════════
-
-  function afficherTableau() {
-    const pA = produits[0];
-    const pB = produits[1];
-    const deuxProduits = pA && pB;
-    const colClass = deuxProduits ? "col-2" : "col-1";
-
-    // ── En-têtes produits ──────────────────────────────────────────────
-    const headersEl = document.getElementById("produits-headers");
-    headersEl.innerHTML = "";
-    headersEl.className = "produits-headers visible" + (deuxProduits ? "" : " seul");
-
-    // Cellule vide en haut à gauche (colonne critères)
-    headersEl.style.gridTemplateColumns = deuxProduits ? "180px 1fr 1fr" : "180px 1fr";
-    headersEl.innerHTML = `<div class="produit-header-vide"></div>`;
-
-    [pA, pB].forEach(p => {
-      if (!p) return;
-      const imgHtml = p.image_url
-        ? `<img class="produit-img" src="${p.image_url}" alt="${p.name}">`
-        : `<div class="produit-img-placeholder">🥚</div>`;
-      const badgesHtml = p.labels_reconnus?.length
-        ? p.labels_reconnus.map(l => `<span class="badge ${classeBadge(l.type)}">${l.nom}</span>`).join("")
-        : `<span class="badge badge-inconnu">Aucun label</span>`;
-      headersEl.innerHTML += `
-        <div class="produit-header-col">
-          ${imgHtml}
-          <div class="produit-meta">
-            <h2>${p.name}</h2>
-            <div class="marque">${p.brand}</div>
-            <div class="badges">${badgesHtml}</div>
-          </div>
+  if (aucunLabelA || aucunLabelB) {
+    [pA, pB].forEach((p, i) => {
+      if (!p || p.labels_reconnus?.length) return;
+      tabEl.innerHTML += `
+        <div class="alerte-no-label">
+          ⚠️ <strong>Produit ${i===0?"A":"B"} — Aucun label reconnu</strong><br>
+          Tags bruts Open Food Facts : <code>${p.labels_bruts || "aucun"}</code><br>
+          <small>Si tu penses que ce produit a un label, envoie ces tags à l'équipe pour l'ajouter.</small>
         </div>`;
     });
-
-    // ── Corps du tableau ───────────────────────────────────────────────
-    const tableauEl = document.getElementById("tableau-comparatif");
-    tableauEl.innerHTML = "";
-    tableauEl.className = "tableau-comparatif visible" + (deuxProduits ? "" : " seul");
-
-    // On affiche tous les critères
-    let bulleOuverte = null;
-
-    Object.keys(NOMS_CRITERES).forEach((cle, idx) => {
-      const vA = pA ? (pA.garanties?.[cle] || null) : null;
-      const vB = pB ? (pB.garanties?.[cle] || null) : null;
-
-      const valA = vA?.valeur && vA.valeur !== "NS" ? vA.valeur : null;
-      const valB = vB?.valeur && vB.valeur !== "NS" ? vB.valeur : null;
-
-      // Si un seul produit et pas de valeur → ligne vide, on masque
-      if (!deuxProduits && !valA) return;
-
-      // Calcul du surlignage
-      let classeA = "", classeB = "";
-      if (deuxProduits && cle in CRITERES_COMPARABLES) {
-        const sens = CRITERES_COMPARABLES[cle];
-        const nA = extraireNombre(valA);
-        const nB = extraireNombre(valB);
-
-        if (nA !== null && nB !== null && nA !== nB) {
-          const aMeilleur = sens === "min" ? nA < nB : nA > nB;
-          classeA = aMeilleur ? "meilleur" : "moins-bien";
-          classeB = aMeilleur ? "moins-bien" : "meilleur";
-        }
-      }
-
-      // Construction de la ligne
-      const ligne = document.createElement("div");
-      ligne.className = `tableau-ligne ${colClass}`;
-
-      // Cellule critère
-      ligne.innerHTML = `<div class="cell-critere">${NOMS_CRITERES[cle]}</div>`;
-
-      // Fonction pour construire une cellule valeur
-      const celluleValeur = (val, data, suffixId) => {
-        if (!val) return `<div class="cell-valeur ns">Non renseigné</div>`;
-        const idBulle = `bulle-${cle}-${suffixId}`;
-        return `
-          <div class="cell-valeur ${suffixId === 'A' ? classeA : classeB}">
-            <span>${val}</span>
-            <button class="btn-info" data-bulle="${idBulle}">i</button>
-          </div>
-          <div class="bulle-ligne" id="${idBulle}" data-ligne="${idx}">
-            ${data?.label_source ? `<div class="info-label">📋 ${data.label_source}</div>` : ""}
-            ${data?.source && data.source !== "NS"
-              ? `<div class="info-source">📎 ${data.source}</div>`
-              : `<div class="info-source">Source non renseignée</div>`}
-          </div>`;
-      };
-
-      ligne.innerHTML += celluleValeur(valA, vA, "A");
-      if (deuxProduits) ligne.innerHTML += celluleValeur(valB, vB, "B");
-
-      tableauEl.appendChild(ligne);
-    });
-
-    // Debug
-    const debugHtml = [pA, pB].filter(Boolean).map((p, i) => `
-      <details class="debug-section">
-        <summary>Données brutes — Produit ${i === 0 ? "A" : "B"}</summary>
-        <p>labels_tags : ${p.labels_bruts || "aucun"}</p>
-      </details>`).join("");
-    tableauEl.insertAdjacentHTML("beforeend", debugHtml);
-
-    // ── Gestion des bulles d'info ──────────────────────────────────────
-    // Délégation sur le tableau
-    tableauEl.addEventListener("click", e => {
-      const btn = e.target.closest(".btn-info");
-      if (!btn) return;
-
-      const idCible = btn.dataset.bulle;
-      const bulle   = document.getElementById(idCible);
-      if (!bulle) return;
-
-      // Fermer l'ancienne bulle si différente
-      if (bulleOuverte && bulleOuverte.id !== idCible) {
-        bulleOuverte.classList.remove("visible");
-        const ancienBtn = tableauEl.querySelector(`[data-bulle="${bulleOuverte.id}"]`);
-        if (ancienBtn) ancienBtn.classList.remove("actif");
-      }
-
-      const estOuverte = bulle.classList.contains("visible");
-      bulle.classList.toggle("visible", !estOuverte);
-      btn.classList.toggle("actif", !estOuverte);
-      bulleOuverte = estOuverte ? null : bulle;
-    });
   }
 
-  // ── Init ──────────────────────────────────────────────────────────────
-  mettreAJourSlots();
-  </script>
+  // ── Lignes principales ────────────────────────────────────────────────
+  const lignesPrincipales = construireLignes(CRITERES_PRINCIPAUX, pA, pB, deux);
+  lignesPrincipales.forEach(l => tabEl.appendChild(l));
+
+  // ── Bouton "Plus d'informations" ──────────────────────────────────────
+  const btnPlus = document.createElement("button");
+  btnPlus.className = "btn-plus-infos";
+  btnPlus.innerHTML = `<span class="fleche">▼</span> Plus d'informations`;
+  tabEl.appendChild(btnPlus);
+
+  const blocsec = document.createElement("div");
+  blocsec.className = "criteres-secondaires";
+  const lignesSecondaires = construireLignes(CRITERES_SECONDAIRES, pA, pB, deux);
+  lignesSecondaires.forEach(l => blocsec.appendChild(l));
+  tabEl.appendChild(blocsec);
+
+  btnPlus.addEventListener("click", () => {
+    const ouvert = blocsec.classList.toggle("visible");
+    btnPlus.classList.toggle("ouvert", ouvert);
+    btnPlus.innerHTML = ouvert
+      ? `<span class="fleche">▼</span> Moins d'informations`
+      : `<span class="fleche">▼</span> Plus d'informations`;
+  });
+
+  // ── Debug labels bruts ────────────────────────────────────────────────
+  const debugWrap = document.createElement("div");
+  debugWrap.className = "debug-wrap";
+  [pA, pB].forEach((p, i) => {
+    if (!p) return;
+    debugWrap.innerHTML += `
+      <details class="debug-section">
+        <summary>Labels bruts Open Food Facts — Produit ${i===0?"A":"B"}</summary>
+        <p>${p.labels_bruts || "aucun"}</p>
+      </details>`;
+  });
+  tabEl.appendChild(debugWrap);
+
+  // ── Délégation clics bouton i ─────────────────────────────────────────
+  tabEl.addEventListener("click", e => {
+    const btn = e.target.closest(".btn-info");
+    if (!btn) return;
+    const idCible = btn.dataset.bulle;
+    const bulle   = document.getElementById(idCible);
+    if (!bulle) return;
+
+    if (bulleOuverte && bulleOuverte.id !== idCible) {
+      bulleOuverte.classList.remove("visible");
+      const ancienBtn = tabEl.querySelector(`[data-bulle="${bulleOuverte.id}"]`);
+      if (ancienBtn) ancienBtn.classList.remove("actif");
+    }
+    const estOuverte = bulle.classList.contains("visible");
+    bulle.classList.toggle("visible", !estOuverte);
+    btn.classList.toggle("actif", !estOuverte);
+    bulleOuverte = estOuverte ? null : bulle;
+  });
+}
+
+// ── Construit un tableau de <div.tableau-ligne> pour une liste de critères ──
+function construireLignes(listeCriteres, pA, pB, deux) {
+  const lignes = [];
+
+  listeCriteres.forEach((cle, idx) => {
+    const vA = pA?.garanties?.[cle] || null;
+    const vB = pB?.garanties?.[cle] || null;
+    const valA = vA?.valeur && vA.valeur !== "NS" ? vA.valeur : null;
+    const valB = vB?.valeur && vB.valeur !== "NS" ? vB.valeur : null;
+
+    // Masquer si aucun des deux n'a de valeur
+    if (!valA && !valB) return;
+
+    // Surlignage comparatif
+    let classeA = "", classeB = "";
+    if (deux && cle in CRITERES_COMPARABLES) {
+      const sens = CRITERES_COMPARABLES[cle];
+      const nA = extraireNombre(valA), nB = extraireNombre(valB);
+      if (nA !== null && nB !== null && nA !== nB) {
+        const aMeilleur = sens === "min" ? nA < nB : nA > nB;
+        classeA = aMeilleur ? "meilleur" : "moins-bien";
+        classeB = aMeilleur ? "moins-bien" : "meilleur";
+      }
+    }
+
+    const idBulleA = `b-${cle}-A-${idx}`;
+    const idBulleB = `b-${cle}-B-${idx}`;
+
+    const cellule = (val, data, idBulle, extraClasse) => {
+      if (!val) return `<div class="cell-valeur ns">Non renseigné</div>`;
+      return `
+        <div class="cell-valeur ${extraClasse}">
+          <span>${val}</span>
+          <button class="btn-info" data-bulle="${idBulle}">i</button>
+        </div>
+        <div class="bulle-ligne" id="${idBulle}">
+          ${data?.label_source ? `<div class="info-label">📋 ${data.label_source}</div>` : ""}
+          ${data?.source && data.source !== "NS"
+            ? `<div class="info-source">📎 ${data.source}</div>`
+            : `<div class="info-source">Source non renseignée</div>`}
+        </div>`;
+    };
+
+    const ligne = document.createElement("div");
+    ligne.className = "tableau-ligne";
+    ligne.innerHTML =
+      `<div class="cell-critere">${NOMS_CRITERES[cle] || cle}</div>` +
+      cellule(valA, vA, idBulleA, classeA) +
+      (deux ? cellule(valB, vB, idBulleB, classeB) : "");
+
+    lignes.push(ligne);
+  });
+
+  return lignes;
+}
+
+// ── Init ──────────────────────────────────────────────────────────────
+mettreAJourSlots();
+</script>
 </body>
 </html>
