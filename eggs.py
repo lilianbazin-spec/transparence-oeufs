@@ -97,6 +97,17 @@ LABEL_MAPPING = {
 
     # Tags produit 3435760953124 (au sol, détecté via catégories dans main.py)
 
+    # Nourri sans OGM
+    "fr:nourri-sans-ogm":                "nourri_sans_ogm",
+    "en:no-gmo":                         "nourri_sans_ogm",
+    "fr:sans-ogm":                       "nourri_sans_ogm",
+    "en:non-gmo":                        "nourri_sans_ogm",
+    "fr:alimentation-100-vegetaux-et-mineraux-et-vitamines": "nourri_sans_ogm",
+
+    # Origine France (label interprofessionnel)
+    "fr:origine-france":                 "origine_france",
+    "en:origine-france":                 "origine_france",
+
     # Volailles Fermières du Maine
     "fr:volailles-fermieres-du-maine":   "volailles_maine",
     "en:volailles-fermieres-du-maine":   "volailles_maine",
@@ -936,6 +947,72 @@ LABELS_DB = {
         }
     },
 
+    # ──────────────────────────────────────────────────────────────────────────
+    # NOURRI SANS OGM
+    # Garantit uniquement que l'alimentation des animaux est exempte d'OGM.
+    # Pas d'exigence sur les conditions d'élevage.
+    # Source : Règlement (CE) n°1829/2003 + cahiers des charges privés (Agri-Confiance, etc.)
+    # ──────────────────────────────────────────────────────────────────────────
+    "nourri_sans_ogm": {
+        "nom_complet": "Nourri sans OGM",
+        "type": "Label privé / allégation",
+        "criteres": {
+            "alimentation": {
+                "valeur": "Alimentation des animaux sans OGM (≥ 0,9% de seuil de tolérance UE).",
+                "source": "Règlement (CE) n°1829/2003 + cahier des charges privé"
+            },
+            "condition_elevage":       {"valeur": NS, "source": NS},
+            "acces_exterieur":         {"valeur": NS, "source": NS},
+            "exterieur":               {"valeur": NS, "source": NS},
+            "densite_batiment":        {"valeur": NS, "source": NS},
+            "effectif_max_batiment":   {"valeur": NS, "source": NS},
+            "surface_max_batiment":    {"valeur": NS, "source": NS},
+            "surface_max_site":        {"valeur": NS, "source": NS},
+            "effectif_par_elevage":    {"valeur": NS, "source": NS},
+            "parcours_exterieur":      {"valeur": NS, "source": NS},
+            "surface_parcours":        {"valeur": NS, "source": NS},
+            "vide_sanitaire_batiment": {"valeur": NS, "source": NS},
+            "vide_sanitaire_parcours": {"valeur": NS, "source": NS},
+            "age_max_poules":          {"valeur": NS, "source": NS},
+            "age_min_abattage":        {"valeur": NS, "source": NS},
+            "aire_geographique":       {"valeur": NS, "source": NS},
+            "frequence_ramassage":     {"valeur": NS, "source": NS},
+        }
+    },
+
+    # ──────────────────────────────────────────────────────────────────────────
+    # ORIGINE FRANCE
+    # Label interprofessionnel garantissant uniquement l'origine française
+    # du produit. Pas d'exigence sur les conditions d'élevage.
+    # Source : Décret n°2002-1120 relatif à l'indication de provenance
+    # ──────────────────────────────────────────────────────────────────────────
+    "origine_france": {
+        "nom_complet": "Origine France",
+        "type": "Label interprofessionnel",
+        "criteres": {
+            "alimentation":            {"valeur": NS, "source": NS},
+            "condition_elevage":       {"valeur": NS, "source": NS},
+            "acces_exterieur":         {"valeur": NS, "source": NS},
+            "exterieur":               {"valeur": NS, "source": NS},
+            "densite_batiment":        {"valeur": NS, "source": NS},
+            "effectif_max_batiment":   {"valeur": NS, "source": NS},
+            "surface_max_batiment":    {"valeur": NS, "source": NS},
+            "surface_max_site":        {"valeur": NS, "source": NS},
+            "effectif_par_elevage":    {"valeur": NS, "source": NS},
+            "parcours_exterieur":      {"valeur": NS, "source": NS},
+            "surface_parcours":        {"valeur": NS, "source": NS},
+            "vide_sanitaire_batiment": {"valeur": NS, "source": NS},
+            "vide_sanitaire_parcours": {"valeur": NS, "source": NS},
+            "age_max_poules":          {"valeur": NS, "source": NS},
+            "age_min_abattage":        {"valeur": NS, "source": NS},
+            "aire_geographique": {
+                "valeur": "France",
+                "source": "Décret n°2002-1120 relatif à l'indication de provenance"
+            },
+            "frequence_ramassage":     {"valeur": NS, "source": NS},
+        }
+    },
+
 }  # fin LABELS_DB
 
 
@@ -962,6 +1039,8 @@ PRIORITY_ORDER = [
     "volailles_gascogne",
     "bleu_blanc_coeur",
     "oeufs_de_france",
+    "origine_france",
+    "nourri_sans_ogm",
     "code_1_plein_air",
     "code_2_sol",
     "code_3_cage",
