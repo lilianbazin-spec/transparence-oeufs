@@ -158,7 +158,10 @@
     .produit-header-col {
       padding: 14px 12px; border-left: 1px solid var(--beige-mid);
       display: flex; align-items: flex-start; gap: 10px;
+      transition: background 0.2s;
     }
+    .produit-header-col.header-meilleur   { background: var(--vert-clair); }
+    .produit-header-col.header-moins-bien { background: var(--rouge-clair); }
     .produit-img {
       width: 56px; height: 56px; object-fit: contain;
       border-radius: 8px; background: var(--beige);
@@ -180,8 +183,13 @@
     .badge-lr      { background: #fff3e0; color: #e65100; border: 1px solid #ffcc80; }
     .badge-igp     { background: #e3f2fd; color: #1565c0; border: 1px solid #90caf9; }
     .badge-prive   { background: #f3e5f5; color: #6a1b9a; border: 1px solid #ce93d8; }
-    .badge-code    { background: #f5f5f5; color: #424242; border: 1px solid #bdbdbd; }
-    .badge-inconnu { background: var(--beige-mid); color: var(--texte-doux); border: 1px solid #ddd; }
+    .badge-code         { background: #f5f5f5; color: #424242; border: 1px solid #bdbdbd; }
+    .badge-inconnu      { background: var(--beige-mid); color: var(--texte-doux); border: 1px solid #ddd; }
+    .badge-non-certifie { background: #fdecea; color: #c62828; border: 1px solid #ef9a9a; font-weight: 700; }
+    .badge-non-certifie { background: #fdecea; color: #c62828; border: 1px solid #ef9a9a; font-weight: 700; }
+
+    /* Comparaison : certifié vs non certifié */
+    .cell-valeur.certifie { background: var(--vert-clair); color: var(--vert-fonce); font-weight: 500; }
 
     /* ── Tableau ── */
     .tableau-comparatif {
@@ -595,16 +603,29 @@ function afficherTableau() {
   headEl.className = `produits-headers visible ${colCls}`;
   headEl.innerHTML = `<div class="header-vide"></div>`;
 
-  [pA, pB].forEach(p => {
+  // Détecter si l'un est certifié et l'autre non pour le surlignage vert/rouge
+  const certifieA = !!(pA?.labels_reconnus?.length);
+  const certifieB = !!(pB?.labels_reconnus?.length);
+  const comparaisonCertif = deux && (certifieA !== certifieB);
+
+  [pA, pB].forEach((p, idx) => {
     if (!p) return;
     const img = p.image_url
       ? `<img class="produit-img" src="${p.image_url}" alt="">`
       : `<div class="produit-img-placeholder">🥚</div>`;
-    const badges = p.labels_reconnus?.length
+    const estCertifie = !!(p.labels_reconnus?.length);
+    const badges = estCertifie
       ? p.labels_reconnus.map(l => `<span class="badge ${classeBadge(l.type)}">${l.nom}</span>`).join("")
-      : `<span class="badge badge-inconnu">Aucun label</span>`;
+      : `<span class="badge badge-non-certifie">⚠ Produit non certifié</span>`;
+
+    // Surlignage de l'en-tête si comparaison certifié vs non certifié
+    let extraClasse = "";
+    if (comparaisonCertif) {
+      extraClasse = estCertifie ? " header-meilleur" : " header-moins-bien";
+    }
+
     headEl.innerHTML += `
-      <div class="produit-header-col">
+      <div class="produit-header-col${extraClasse}">
         ${img}
         <div class="produit-meta">
           <h2>${p.name}</h2>
@@ -716,6 +737,13 @@ function construireLignes(listeCriteres, pA, pB, deux) {
         classeA = aMeilleur ? "meilleur" : "moins-bien";
         classeB = aMeilleur ? "moins-bien" : "meilleur";
       }
+    }
+
+    // Surlignage certifié vs non certifié :
+    // si un côté a une valeur et l'autre non → le côté renseigné est vert
+    if (deux && !classeA && !classeB) {
+      if (valA && !valB) classeA = "certifie";
+      if (valB && !valA) classeB = "certifie";
     }
 
     const idBulleA = `b-${cle}-A-${idx}`;
