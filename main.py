@@ -1,4 +1,6 @@
 from fastapi import FastAPI
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 import requests
 from fastapi.middleware.cors import CORSMiddleware
 from eggs import detect_labels, get_best_guarantees
@@ -13,11 +15,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# ── Sert le fichier index.html à la racine ────────────────────────────────────
+@app.get("/")
+def root():
+    return FileResponse("index.html")
 
+
+# ── Endpoint scan ─────────────────────────────────────────────────────────────
 @app.get("/scan/{barcode}")
 def scan_product(barcode: str):
 
-    # ── Étape 1 : interroger Open Food Facts ──────────────────────────────────
     url = f"https://world.openfoodfacts.org/api/v0/product/{barcode}.json"
     response = requests.get(url)
     data = response.json()
@@ -27,52 +34,29 @@ def scan_product(barcode: str):
 
     product = data["product"]
 
-    # ── Étape 2 : récupérer les labels bruts ──────────────────────────────────
     labels_tags = product.get("labels_tags", [])
     labels_bruts_str = ", ".join(labels_tags)
 
-    # ── Étape 3 : analyser les labels avec eggs.py ────────────────────────────
     labels_detectes = detect_labels(labels_bruts_str)
     resultat = get_best_guarantees(labels_detectes)
 
-    # ── Étape 4 : corriger l'aire géographique selon les données du produit ───
-    #
-    # Le règlement UE bio (2018/848) est valable sur tout le territoire UE,
-    # donc eggs.py retourne "Tout territoire UE" pour le label bio.
-    # Mais Open Food Facts fournit le champ "origins" qui indique le pays
-    # de production réel. On l'utilise pour affiner l'affichage.
-    #
-    # Exemples de valeurs Open Food Facts :
-    #   origins          → "France" ou "en:france" ou "France, Bretagne"
-    #   manufacturing_places → "Loué, Sarthe"
-    #   countries        → "en:france"
-
+    # Correction aire géographique via champ origins Open Food Facts
     origine_produit = (
         product.get("origins", "")
         or product.get("manufacturing_places", "")
         or product.get("countries", "")
     ).strip()
 
-    # Si on a une origine ET que le critère aire_geographique est renseigné,
-    # on remplace la valeur générique par l'origine réelle du produit.
+    valeurs_generiques = ["Tout territoire UE", "France entière"]
     if origine_produit and "garanties" in resultat:
         garantie_aire = resultat["garanties"].get("aire_geographique", {})
-        valeur_actuelle = garantie_aire.get("valeur", "NS")
-
-        # On n'écrase que si la valeur est générique (UE ou France entière)
-        # et non une zone IGP précise (ex: "Sarthe, Mayenne")
-        valeurs_generiques = [
-            "Tout territoire UE",
-            "France entière",
-        ]
-        if valeur_actuelle in valeurs_generiques:
+        if garantie_aire.get("valeur") in valeurs_generiques:
             resultat["garanties"]["aire_geographique"] = {
                 "valeur": origine_produit,
                 "source": "Champ 'origins' Open Food Facts (donnée déclarée par le producteur)",
                 "label_source": "Open Food Facts",
             }
 
-    # ── Étape 5 : construire et retourner la réponse complète ─────────────────
     return {
         "found": True,
         "product": {
