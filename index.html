@@ -349,32 +349,55 @@
 const API_BASE = "";
 
 // Critères principaux (toujours visibles)
-const CRITERES_PRINCIPAUX = [
-  "alimentation",
-  "condition_elevage",
-  "acces_exterieur",
-  "densite_batiment",
-  "surface_max_batiment",
-  "surface_max_site",
-  "effectif_par_elevage",
-  "vide_sanitaire_batiment",
-  "age_max_poules",
-  "age_min_abattage",
-  "aire_geographique",
-  "frequence_ramassage",
+// ── Critères selon le type de produit ──────────────────────────────────────
+
+const CRITERES_OEUFS_PRINCIPAUX = [
+  "alimentation", "condition_elevage", "acces_exterieur",
+  "densite_batiment", "surface_max_batiment", "surface_max_site",
+  "effectif_par_elevage", "vide_sanitaire_batiment",
+  "age_max_poules", "age_min_abattage", "aire_geographique", "frequence_ramassage",
+];
+const CRITERES_OEUFS_SECONDAIRES = [
+  "exterieur", "effectif_max_batiment", "parcours_exterieur",
+  "surface_parcours", "vide_sanitaire_parcours",
 ];
 
-// Critères secondaires (masqués derrière "Plus d'informations")
-const CRITERES_SECONDAIRES = [
-  "exterieur",
-  "effectif_max_batiment",
-  "parcours_exterieur",
-  "surface_parcours",
-  "vide_sanitaire_batiment",
-  "vide_sanitaire_parcours",
+const CRITERES_POULET_PRINCIPAUX = [
+  "alimentation", "condition_elevage", "acces_exterieur",
+  "type_batiment", "densite_batiment", "surface_parcours",
+  "race_souche", "age_min_abattage", "aire_geographique",
 ];
+const CRITERES_POULET_SECONDAIRES = [
+  "effectif_max_batiment",
+];
+
+// Sélection dynamique selon le produit
+function getCriteres(product) {
+  if (product?.product_type === "chicken") {
+    return {
+      principaux:   CRITERES_POULET_PRINCIPAUX,
+      secondaires:  CRITERES_POULET_SECONDAIRES,
+    };
+  }
+  return {
+    principaux:  CRITERES_OEUFS_PRINCIPAUX,
+    secondaires: CRITERES_OEUFS_SECONDAIRES,
+  };
+}
+
+// Pour le tableau comparatif on prend l'union des critères des deux produits
+function getCriteresComparaison(pA, pB) {
+  const typeA = pA?.product_type;
+  const typeB = pB?.product_type;
+  const type  = typeA || typeB;
+  if (type === "chicken") {
+    return { principaux: CRITERES_POULET_PRINCIPAUX, secondaires: CRITERES_POULET_SECONDAIRES };
+  }
+  return { principaux: CRITERES_OEUFS_PRINCIPAUX, secondaires: CRITERES_OEUFS_SECONDAIRES };
+}
 
 const NOMS_CRITERES = {
+  // Œufs
   alimentation:            "Alimentation",
   condition_elevage:       "Condition d'élevage",
   acces_exterieur:         "Accès extérieur",
@@ -392,7 +415,14 @@ const NOMS_CRITERES = {
   age_min_abattage:        "Âge min abattage",
   aire_geographique:       "Aire géographique",
   frequence_ramassage:     "Fréquence ramassage",
+  // Poulet
+  type_batiment:           "Type de bâtiment",
+  race_souche:             "Race / souche",
 };
+
+// Pour la compatibilité avec construireLignes qui utilise ces variables
+let CRITERES_PRINCIPAUX  = CRITERES_OEUFS_PRINCIPAUX;
+let CRITERES_SECONDAIRES = CRITERES_OEUFS_SECONDAIRES;
 
 // Critères comparables numériquement (min = plus petit est meilleur, max = plus grand est meilleur)
 const CRITERES_COMPARABLES = {
@@ -657,8 +687,11 @@ function afficherTableau() {
     });
   }
 
+  // ── Sélection des critères selon le type de produit ─────────────────
+  const criteres = deux ? getCriteresComparaison(pA, pB) : getCriteres(pA || pB);
+
   // ── Lignes principales ────────────────────────────────────────────────
-  const lignesPrincipales = construireLignes(CRITERES_PRINCIPAUX, pA, pB, deux);
+  const lignesPrincipales = construireLignes(criteres.principaux, pA, pB, deux);
   lignesPrincipales.forEach(l => tabEl.appendChild(l));
 
   // ── Bouton "Plus d'informations" ──────────────────────────────────────
@@ -669,7 +702,7 @@ function afficherTableau() {
 
   const blocsec = document.createElement("div");
   blocsec.className = "criteres-secondaires";
-  const lignesSecondaires = construireLignes(CRITERES_SECONDAIRES, pA, pB, deux);
+  const lignesSecondaires = construireLignes(criteres.secondaires, pA, pB, deux);
   lignesSecondaires.forEach(l => blocsec.appendChild(l));
   tabEl.appendChild(blocsec);
 
