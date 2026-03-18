@@ -20,40 +20,42 @@ def root():
     return FileResponse("index.html")
 
 
-# ── Table de correspondance catégories OFF → clés internes ───────────────────
-# Quand les labels_tags sont vides ou insuffisants, on regarde les catégories
-CATEGORIES_MAPPING = {
+# ── Détection du système d'élevage dans les catégories OFF ──────────────────
+# On utilise des mots-clés plutôt que des tags exacts — bien plus robuste
+# car OFF peut utiliser "en:free-range-eggs", "en:free-range-hen-eggs", etc.
+
+CATEGORIES_KEYWORDS = [
+    # (mots-clés à chercher dans le tag, clé interne)
+    # Bio — testé en premier car plus exigeant
+    (["organic-egg", "oeufs-bio", "oeufs-biologiques", "bio-egg"], "bio"),
+
     # Plein air
-    "en:free-range-eggs":                        "code_1_plein_air",
-    "fr:oeufs-de-poules-elevees-en-plein-air":   "code_1_plein_air",
-    "en:free-range-hen-eggs":                    "code_1_plein_air",
+    (["free-range", "plein-air", "plein_air",
+      "elevees-en-plein", "élevées-en-plein",
+      "outdoor", "oeufs-plein"], "code_1_plein_air"),
 
     # Au sol
-    "en:barn-eggs":                              "code_2_sol",
-    "fr:oeufs-de-poules-elevees-au-sol":         "code_2_sol",
-    "en:barn-laid-eggs":                         "code_2_sol",
+    (["barn", "au-sol", "au_sol",
+      "elevees-au-sol", "élevées-au-sol",
+      "sol-egg", "floor-reared"], "code_2_sol"),
 
     # Cage
-    "en:eggs-from-caged-hens":                   "code_3_cage",
-    "fr:oeufs-de-poules-elevees-en-cage":        "code_3_cage",
-
-    # Bio
-    "en:organic-eggs":                           "bio",
-    "fr:oeufs-biologiques":                      "bio",
-}
+    (["caged", "en-cage", "en_cage",
+      "cage-egg", "battery"], "code_3_cage"),
+]
 
 def detect_from_categories(categories_tags: list) -> list[str]:
     """
-    Cherche des indices de système d'élevage dans les catégories OFF
-    quand les labels_tags sont insuffisants.
+    Cherche le système d'élevage dans les catégories OFF par mots-clés.
+    Retourne la liste des clés internes détectées.
     """
     detected = []
     for tag in categories_tags:
         tag_norm = tag.strip().lower()
-        if tag_norm in CATEGORIES_MAPPING:
-            key = CATEGORIES_MAPPING[tag_norm]
+        for keywords, key in CATEGORIES_KEYWORDS:
             if key not in detected:
-                detected.append(key)
+                if any(kw in tag_norm for kw in keywords):
+                    detected.append(key)
     return detected
 
 
