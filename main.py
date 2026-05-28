@@ -25,7 +25,7 @@ app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=True,
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -79,11 +79,15 @@ def detect_from_categories(categories_tags: list) -> list[str]:
 @app.get("/scan/{barcode}")
 def scan_product(barcode: str):
 
-    url = f"https://world.openfoodfacts.org/api/v0/product/{barcode}.json"
-    response = requests.get(url)
-    data = response.json()
+    url = f"https://world.openfoodfacts.org/api/v2/product/{barcode}.json"
+    try:
+        response = requests.get(url, timeout=10)
+        response.raise_for_status()
+        data = response.json()
+    except requests.RequestException:
+        return {"found": False, "message": "Open Food Facts injoignable, réessayez plus tard"}
 
-    if data.get("status") == 0:
+    if data.get("status") == 0 or "product" not in data:
         return {"found": False, "message": "Produit non trouvé dans Open Food Facts"}
 
     product = data["product"]
