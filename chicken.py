@@ -29,7 +29,8 @@ Sources :
     "Volailles du Maine". Loué est redevenu une marque commerciale.
 """
 
-NS = "NS"
+import labels_core
+from labels_core import NS
 
 # ══════════════════════════════════════════════════════════════════════════════
 # PARTIE 1 — TABLE DE CORRESPONDANCE
@@ -859,58 +860,16 @@ PRIORITY_ORDER = [
 ]
 
 
+# Clés internes correspondant à un système d'élevage (vs simple label de qualité).
+ELEVAGE_CODES = {
+    "code_a_plein_air", "code_b_extensif", "code_standard",
+    "bio_poulet", "label_rouge_poulet",
+}
+
+
 def detect_labels(raw_labels_string: str) -> list[str]:
-    if not raw_labels_string:
-        return []
-    detected = []
-    tokens = [t.strip().lower() for t in raw_labels_string.split(",")]
-    for token in tokens:
-        if token in LABEL_MAPPING:
-            key = LABEL_MAPPING[token]
-            if key not in detected:
-                detected.append(key)
-    return detected
+    return labels_core.detect_labels(raw_labels_string, LABEL_MAPPING)
 
 
 def get_best_guarantees(detected_labels: list[str]) -> dict:
-    if not detected_labels:
-        return {"labels_reconnus": [], "garanties": {}}
-
-    labels_valides = [l for l in detected_labels if l in LABELS_DB]
-    if not labels_valides:
-        return {"labels_reconnus": [], "garanties": {}}
-
-    labels_reconnus = [
-        {"cle": l, "nom": LABELS_DB[l]["nom_complet"], "type": LABELS_DB[l]["type"]}
-        for l in labels_valides
-    ]
-
-    tous_criteres = list(next(iter(LABELS_DB.values()))["criteres"].keys())
-    garanties = {}
-
-    for critere in tous_criteres:
-        meilleure_valeur = NS
-        meilleure_source = NS
-        meilleur_label = None
-
-        for label_prioritaire in PRIORITY_ORDER:
-            if label_prioritaire in labels_valides:
-                data = LABELS_DB[label_prioritaire]["criteres"].get(critere, {})
-                valeur = data.get("valeur", NS)
-                source = data.get("source", NS)
-                if valeur and valeur != NS:
-                    meilleure_valeur = valeur
-                    meilleure_source = source
-                    meilleur_label = LABELS_DB[label_prioritaire]["nom_complet"]
-                    break
-
-        garanties[critere] = {
-            "valeur": meilleure_valeur,
-            "source": meilleure_source,
-            "label_source": meilleur_label,
-        }
-
-    return {
-        "labels_reconnus": labels_reconnus,
-        "garanties": garanties,
-    }
+    return labels_core.get_best_guarantees(detected_labels, LABELS_DB, PRIORITY_ORDER)

@@ -128,7 +128,8 @@ LABEL_MAPPING = {
 # "NS" = Non Spécifié dans le cahier des charges officiel
 # ══════════════════════════════════════════════════════════════════════════════
 
-NS = "NS"
+import labels_core
+from labels_core import NS
 
 LABELS_DB = {
 
@@ -1047,84 +1048,18 @@ PRIORITY_ORDER = [
 ]
 
 
+# Clés internes correspondant à un système d'élevage (vs simple label de qualité).
+# Sert à décider s'il faut tenter la détection de repli via les catégories OFF.
+ELEVAGE_CODES = {
+    "code_1_plein_air", "code_2_sol", "code_3_cage", "bio",
+    "bio_coherence", "demeter", "label_rouge_plein_air",
+    "label_rouge_liberte", "oeufs_de_loue", "cocorette",
+}
+
+
 def detect_labels(raw_labels_string: str) -> list[str]:
-    """
-    Prend la chaîne brute de labels Open Food Facts (ex: "en:organic, fr:label-rouge")
-    et retourne la liste des clés internes reconnues (ex: ["bio", "label_rouge_plein_air"]).
-    """
-    if not raw_labels_string:
-        return []
-
-    detected = []
-    # On normalise : minuscules, on découpe par virgule, on enlève les espaces
-    tokens = [t.strip().lower() for t in raw_labels_string.split(",")]
-
-    for token in tokens:
-        if token in LABEL_MAPPING:
-            internal_key = LABEL_MAPPING[token]
-            if internal_key not in detected:
-                detected.append(internal_key)
-
-    return detected
+    return labels_core.detect_labels(raw_labels_string, LABEL_MAPPING)
 
 
 def get_best_guarantees(detected_labels: list[str]) -> dict:
-    """
-    Prend une liste de clés internes de labels (ex: ["bio", "label_rouge_plein_air"])
-    et retourne un dictionnaire avec, pour chaque critère, la garantie
-    la plus exigeante trouvée parmi les labels détectés.
-
-    Retourne aussi la liste des labels reconnus avec leur nom complet.
-    """
-    if not detected_labels:
-        return {
-            "labels_reconnus": [],
-            "garanties": {}
-        }
-
-    # On filtre uniquement les labels présents dans notre base
-    labels_valides = [l for l in detected_labels if l in LABELS_DB]
-
-    if not labels_valides:
-        return {
-            "labels_reconnus": [],
-            "garanties": {}
-        }
-
-    # Noms complets des labels reconnus pour l'affichage
-    labels_reconnus = [
-        {"cle": l, "nom": LABELS_DB[l]["nom_complet"], "type": LABELS_DB[l]["type"]}
-        for l in labels_valides
-    ]
-
-    # Pour chaque critère, on cherche la meilleure valeur
-    # selon l'ordre de priorité défini dans PRIORITY_ORDER
-    tous_criteres = list(next(iter(LABELS_DB.values()))["criteres"].keys())
-    garanties = {}
-
-    for critere in tous_criteres:
-        meilleure_valeur = NS
-        meilleure_source = NS
-        meilleur_label = None
-
-        # On parcourt les labels dans l'ordre de priorité
-        for label_prioritaire in PRIORITY_ORDER:
-            if label_prioritaire in labels_valides:
-                valeur = LABELS_DB[label_prioritaire]["criteres"][critere]["valeur"]
-                source = LABELS_DB[label_prioritaire]["criteres"][critere]["source"]
-                if valeur != NS:
-                    meilleure_valeur = valeur
-                    meilleure_source = source
-                    meilleur_label = LABELS_DB[label_prioritaire]["nom_complet"]
-                    break  # On s'arrête dès qu'on trouve une valeur non-NS
-
-        garanties[critere] = {
-            "valeur": meilleure_valeur,
-            "source": meilleure_source,
-            "label_source": meilleur_label,
-        }
-
-    return {
-        "labels_reconnus": labels_reconnus,
-        "garanties": garanties,
-    }
+    return labels_core.get_best_guarantees(detected_labels, LABELS_DB, PRIORITY_ORDER)
