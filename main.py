@@ -79,7 +79,7 @@ def detect_from_categories(categories_tags: list) -> list[str]:
 @app.get("/scan/{barcode}")
 def scan_product(barcode: str):
 
-    url = f"https://world.openfoodfacts.org/api/v2/product/{barcode}.json"
+    url = f"https://world.openfoodfacts.org/api/v0/product/{barcode}.json"
     try:
         response = requests.get(url, timeout=10)
         response.raise_for_status()
