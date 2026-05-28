@@ -485,6 +485,11 @@ let bulleOuverte  = null;
 
 function setStatus(msg) { document.getElementById("status").textContent = msg; }
 
+function setBusy(busy) {
+  document.getElementById("btn-analyser").disabled = busy;
+  document.getElementById("btn-camera").disabled   = busy;
+}
+
 function mettreAJourSlots() {
   document.getElementById("dot-1").className =
     "slot-dot" + (produits[0] ? " rempli" : (slotActif === 0 ? " actif" : ""));
@@ -579,16 +584,14 @@ document.getElementById("btn-reset").addEventListener("click", () => {
 
 async function lancerRecherche(barcode) {
   setStatus("Recherche en cours…");
-  document.getElementById("btn-analyser").disabled = true;
-  document.getElementById("btn-camera").disabled   = true;
+  setBusy(true);
 
   try {
     const res  = await fetch(`${API_BASE}/scan/${barcode}`);
     if (!res.ok) throw new Error();
     const data = await res.json();
 
-    document.getElementById("btn-analyser").disabled = false;
-    document.getElementById("btn-camera").disabled   = false;
+    setBusy(false);
 
     if (!data.found) { setStatus(`⚠️ ${data.message}`); return; }
 
@@ -613,8 +616,7 @@ async function lancerRecherche(barcode) {
 
   } catch {
     setStatus("⚠️ Impossible de contacter le serveur.");
-    document.getElementById("btn-analyser").disabled = false;
-    document.getElementById("btn-camera").disabled   = false;
+    setBusy(false);
   }
 }
 
@@ -634,16 +636,15 @@ function afficherTableau() {
   headEl.innerHTML = `<div class="header-vide"></div>`;
 
   // Détecter si l'un est certifié et l'autre non pour le surlignage vert/rouge
-  const certifieA = !!(pA?.labels_reconnus?.length);
-  const certifieB = !!(pB?.labels_reconnus?.length);
-  const comparaisonCertif = deux && (certifieA !== certifieB);
+  const estCertifieProduit = p => !!(p?.labels_reconnus?.length);
+  const comparaisonCertif = deux && (estCertifieProduit(pA) !== estCertifieProduit(pB));
 
   [pA, pB].forEach((p, idx) => {
     if (!p) return;
     const img = p.image_url
       ? `<img class="produit-img" src="${p.image_url}" alt="">`
       : `<div class="produit-img-placeholder">🥚</div>`;
-    const estCertifie = !!(p.labels_reconnus?.length);
+    const estCertifie = estCertifieProduit(p);
     const badges = estCertifie
       ? p.labels_reconnus.map(l => `<span class="badge ${classeBadge(l.type)}">${l.nom}</span>`).join("")
       : `<span class="badge badge-non-certifie">⚠ Produit non certifié</span>`;
