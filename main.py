@@ -2,8 +2,8 @@ from fastapi import FastAPI
 from fastapi.responses import FileResponse
 import requests
 from fastapi.middleware.cors import CORSMiddleware
-from eggs import detect_labels as eggs_detect_labels, get_best_guarantees as eggs_get_best_guarantees
-from chicken import detect_labels as chicken_detect_labels, get_best_guarantees as chicken_get_best_guarantees
+from eggs import detect_labels as eggs_detect_labels, get_best_guarantees as eggs_get_best_guarantees, ELEVAGE_CODES as EGGS_ELEVAGE_CODES
+from chicken import detect_labels as chicken_detect_labels, get_best_guarantees as chicken_get_best_guarantees, ELEVAGE_CODES as CHICKEN_ELEVAGE_CODES
 
 # Catégories de produit détectées via les categories_tags OFF
 CHICKEN_KEYWORDS = ["chicken", "poulet", "volaille-de-chair", "broiler"]
@@ -112,12 +112,7 @@ def scan_product(barcode: str):
     labels_detectes = detect_fn(labels_bruts_str)
 
     # ── Fallback : détection via categories_tags ──────────────────────────────
-    codes_elevage_eggs    = {"code_1_plein_air", "code_2_sol", "code_3_cage", "bio",
-                             "bio_coherence", "demeter", "label_rouge_plein_air",
-                             "label_rouge_liberte", "oeufs_de_loue", "cocorette"}
-    codes_elevage_chicken = {"code_a_plein_air", "code_b_extensif", "code_standard",
-                             "bio_poulet", "label_rouge_poulet"}
-    codes_elevage = codes_elevage_chicken if product_type == "chicken" else codes_elevage_eggs
+    codes_elevage = CHICKEN_ELEVAGE_CODES if product_type == "chicken" else EGGS_ELEVAGE_CODES
     a_code_elevage = any(l in codes_elevage for l in labels_detectes)
 
     if not a_code_elevage:
